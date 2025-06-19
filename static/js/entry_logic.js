@@ -20,19 +20,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const classSelect = document.querySelector('select[name="cls"]');
     const subjectContainer = document.querySelector('#subject-fields');
 
-    classSelect.addEventListener('change', () => {
-        const selectedClass = classSelect.value;
-        subjectContainer.innerHTML = '';
+    if (classSelect && subjectContainer) {
+        classSelect.addEventListener('change', () => {
+            const selectedClass = classSelect.value;
+            subjectContainer.innerHTML = '';
 
-        if (classToSubjects[selectedClass]) {
-            classToSubjects[selectedClass].forEach(subject => {
-                const fieldHTML = `
-                    <div>
-                        <label class="block">${subject}</label>
-                        <input type="number" name="marks_${subject}" class="border w-full px-4 py-2 rounded" min="0" max="100">
-                    </div>`;
-                subjectContainer.innerHTML += fieldHTML;
-            });
-        }
-    });
+            if (classToSubjects[selectedClass]) {
+                classToSubjects[selectedClass].forEach(subject => {
+                    const fieldHTML = `
+                        <div>
+                            <label class="block">${subject}</label>
+                            <input type="number" name="marks_${subject}" class="border w-full px-4 py-2 rounded" min="0" max="100">
+                        </div>`;
+                    subjectContainer.innerHTML += fieldHTML;
+                });
+            }
+        });
+    }
 });

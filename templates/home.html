@@ -1,6 +1,109 @@
-{% extends "layout.html" %}
-{% block content %}
-<h1 class="text-2xl font-bold mb-4">Welcome to Result System</h1>
-<a href="/enter" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Enter Results</a>
-<a href="/view" class="ml-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">View Results</a>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Result System - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-green-50 min-h-screen">
+    <div class="container mx-auto p-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600 mb-4">
+                🏫 School Result System
+            </h1>
+            <p class="text-xl text-gray-600">Digital Solution for Student Result Management</p>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <!-- Enter Results -->
+            <div class="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-gray-100">
+                <div class="text-center">
+                    <div class="text-6xl mb-4">✏️</div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Enter Results</h3>
+                    <p class="text-gray-600 mb-6">Add student marks for different subjects and classes</p>
+                    <a href="/enter" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transform hover:scale-105 transition-all duration-200 inline-block">
+                        Start Entry
+                    </a>
+                </div>
+            </div>
+
+            <!-- View Results -->
+            <div class="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-gray-100">
+                <div class="text-center">
+                    <div class="text-6xl mb-4">📊</div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">View Results</h3>
+                    <p class="text-gray-600 mb-6">Browse and search student results by class or name</p>
+                    <a href="/view" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transform hover:scale-105 transition-all duration-200 inline-block">
+                        View Results
+                    </a>
+                </div>
+            </div>
+
+            <!-- Generate Reports -->
+            <div class="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-gray-100">
+                <div class="text-center">
+                    <div class="text-6xl mb-4">📋</div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Generate Reports</h3>
+                    <p class="text-gray-600 mb-6">Create PDF reports and individual certificates</p>
+                    <button class="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transform hover:scale-105 transition-all duration-200 opacity-50 cursor-not-allowed">
+                        Coming Soon
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="mt-16 bg-white rounded-3xl shadow-xl p-8 max-w-4xl mx-auto border border-gray-100">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">📈 Quick Stats</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="bg-blue-50 rounded-2xl p-6">
+                    <div class="text-3xl font-bold text-blue-600">--</div>
+                    <div class="text-gray-600 mt-2">Total Students</div>
+                </div>
+                <div class="bg-green-50 rounded-2xl p-6">
+                    <div class="text-3xl font-bold text-green-600">--</div>
+                    <div class="text-gray-600 mt-2">Classes</div>
+                </div>
+                <div class="bg-purple-50 rounded-2xl p-6">
+                    <div class="text-3xl font-bold text-purple-600">--</div>
+                    <div class="text-gray-600 mt-2">Subjects</div>
+                </div>
+                <div class="bg-yellow-50 rounded-2xl p-6">
+                    <div class="text-3xl font-bold text-yellow-600">--</div>
+                    <div class="text-gray-600 mt-2">Results</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features List -->
+        <div class="mt-16 max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">✨ Features</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                    <h4 class="font-semibold text-gray-800 mb-2">🎯 Smart Subject Loading</h4>
+                    <p class="text-gray-600">Subjects automatically load based on selected class</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                    <h4 class="font-semibold text-gray-800 mb-2">🔄 Duplicate Handling</h4>
+                    <p class="text-gray-600">Smart handling of duplicate roll numbers</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                    <h4 class="font-semibold text-gray-800 mb-2">✅ Input Validation</h4>
+                    <p class="text-gray-600">Comprehensive validation for all inputs</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                    <h4 class="font-semibold text-gray-800 mb-2">🎨 Modern Interface</h4>
+                    <p class="text-gray-600">Clean, user-friendly design</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-16 text-gray-500">
+            <p>&copy; 2024 School Result System. Built with ❤️ for education.</p>
+        </div>
+    </div>
+</body>
+</html>
