@@ -16,3 +16,30 @@ Wanna see following thnings in the app at the base:
 <li> Save marks to DB </li>
  <li> Conformation Flash Message </li>
 </ol>
+
+
+# Current folder structure of project:
+```
+result-system/
+├── templates/
+│   ├── layout.html
+│   ├── home.html
+│   ├── enter_result.html
+│   └── view_result.html
+├── static/
+│   ├── css/
+│   │   └── tailwind.min.css  (CDN-linked via HTML)
+│   └── js/
+├── models/
+│   └── models.py
+├── forms/
+│   └── result_forms.py
+├── utils/
+│   └── grading.py  (for % and grade logic)
+├── database/
+│   └── result.db  (SQLite for now)
+├── app.py
+├── requirements.txt
+└── README.md
+
+```
