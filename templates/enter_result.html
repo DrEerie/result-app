@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enter Student Result</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="{{ url_for('static', filename='js/entry_logic.js') }}"></script>
+
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center justify-start p-8">
+  <div class="bg-white shadow-2xl rounded-2xl w-full max-w-4xl p-8">
+    <h2 class="text-3xl font-bold text-center mb-6 text-green-600">🎓 Add New Student Result</h2>
+
+    <form method="POST">
+      <!-- Student Info -->
+      <div class="grid grid-cols-2 gap-6 mb-6">
+        <div>
+          <label class="block font-medium">Student Name</label>
+          <input type="text" name="student_name" pattern="^[A-Za-z ]+$" class="border w-full px-4 py-2 rounded" required>
+        </div>
+        <div>
+          <label class="block font-medium">Roll Number</label>
+          <input type="text" name="roll_no" class="border w-full px-4 py-2 rounded" required>
+        </div>
+        <div>
+          <label class="block font-medium">Class</label>
+          <select name="cls" id="class-select" class="border w-full px-4 py-2 rounded" required>
+            <option value="">Select class</option>
+            <option value="Mont">Mont</option>
+            <option value="Nur">Nur</option>
+            <option value="KG">KG</option>
+            {% for i in range(1, 13) %}
+              <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block font-medium">Section</label>
+          <input type="text" name="section" class="border w-full px-4 py-2 rounded" required>
+        </div>
+      </div>
+
+      <!-- Subject Marks Section (Initially Hidden and JS Controlled) -->
+      <h3 class="text-xl font-semibold mb-4 text-gray-700">Subject Marks</h3>
+
+      <div id="subject-section">
+        <!-- Lower Class Subjects -->
+        <div id="lower-class-subjects" class="grid grid-cols-2 gap-4 mb-6 hidden">
+          <div><label class="block">English</label><input type="number" name="marks_english" class="border w-full px-4 py-2 rounded" min="0" max="100"></div>
+          <div><label class="block">Hindi</label><input type="number" name="marks_hindi" class="border w-full px-4 py-2 rounded" min="0" max="100"></div>
+          <div><label class="block">Mathematics</label><input type="number" name="marks_math" class="border w-full px-4 py-2 rounded" min="0" max="100"></div>
+          <div><label class="block">Science</label><input type="number" name="marks_science" class="border w-full px-4 py-2 rounded" min="0" max="100"></div>
+        </div>
+
+        <!-- High Class Subjects -->
+        <div id="high-class-subjects" class="grid grid-cols-2 gap-4 mb-6 hidden">
+          <div><label class="block">Physics</label><input type="number" name="marks_physics" class="border w-full px-4 py-2 rounded" min="0" max="100"></div>
+          <div><label class="block">Mathematics</label><input type="number" name="marks_math" class="border w-full px-4 py-2 rounded" min="0" max="100"></div>
+          <div><label class="block">Chemistry</label><input type="number" name="marks_chemistry" class="border w-full px-4 py-2 rounded" min="0" max="100"></div>
+        </div>
+      </div>
+      
+      
+
+      <!-- Submit -->
+      <div class="text-center">
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl text-lg">💾 Add Student Result</button>
+      </div>
+    </form>
+
+    {% if existing_roll %}
+  <div class="mt-4 text-center">
+    <form method="POST">
+      {% for key, val in prefill.items() %}
+        <input type="hidden" name="{{ key }}" value="{{ val }}">
+      {% endfor %}
+
+      <input type="hidden" name="action_type" value="overwrite">
+      <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded">Overwrite Existing</button>
+    </form>
+
+    <form method="POST" class="inline-block ml-4">
+      {% for key, val in prefill.items() %}
+        <input type="hidden" name="{{ key }}" value="{{ val }}">
+      {% endfor %}
+      <input type="hidden" name="action_type" value="delete">
+      <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Delete Then Add New</button>
+    </form>
+  </div>
+{% endif %}
+
+    <!-- Show success/error messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  <ul class="mt-4 text-center font-semibold">
+    {% for category, message in messages %}
+      <li class="{{ 'text-red-600' if category == 'error' else 'text-green-600' }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+{% endwith %}
+
+
+  </div>
+</body>
+</html>
