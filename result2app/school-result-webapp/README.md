@@ -1,4 +1,4 @@
-# School Result Web Application
+# School Result Web Application (JS based but not working on it yet..)
 
 This project is a web application designed to manage and display school results. It provides an interactive interface for users to view and process results efficiently.
 
