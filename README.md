@@ -12,7 +12,7 @@ Wanna see following thnings in the app at the base:
  <li> Class drop-down so that subject will be automatically loaded for the mention class </li>
 <li> Make the dynamic result on-time. Subject wise plus overall grading and percentage. </li> 
 <li> Preview result online </li> 
-<li>Generate Individual MarksheetGenerate PDF Report for Each Class/ Section </li> 
+<li>Generate Individual Marksheet Pluse Generate PDF Report for Each Class/ Section </li> 
 <li> Save marks to DB </li>
  <li> Conformation Flash Message </li>
 </ol>
