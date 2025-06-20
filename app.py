@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from models.models import db, Student, Subject, Result
+from utils.grading import calculate_student_overall_result, get_grade_color, get_result_status_color
 import os
 
 app = Flask(__name__)
@@ -13,7 +14,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-# Subject mapping for different classes
+# Updated and consistent subject mapping for different classes
 CLASS_SUBJECTS = {
     'Mont': ['English', 'Math'],
     'Nur': ['English', 'Math', 'Drawing'],
@@ -57,7 +58,23 @@ def init_database():
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    # Get stats for dashboard
+    with app.app_context():
+        total_students = Student.query.count()
+        total_results = Result.query.count()
+        
+        # Get unique classes and subjects
+        classes = db.session.query(Student.cls).distinct().count()
+        subjects = Subject.query.count()
+    
+    stats = {
+        'total_students': total_students,
+        'total_classes': classes,
+        'total_subjects': subjects,
+        'total_results': total_results
+    }
+    
+    return render_template('home.html', stats=stats)
 
 @app.route('/enter', methods=['GET', 'POST'])
 def enter_result():
@@ -176,8 +193,60 @@ def add_results(student, cls, form_data):
 
 @app.route('/view')
 def view_results():
+    """View all student results with grades and calculations"""
     students = Student.query.all()
-    return render_template('view_result.html', students=students)
+    
+    # Prepare students data with calculated results
+    students_data = []
+    for student in students:
+        # Get all results for this student
+        results = Result.query.filter_by(student_id=student.id).all()
+        
+        # Calculate overall result using grading system
+        overall_result = calculate_student_overall_result(results)
+        
+        # Add color classes for display
+        overall_result['grade_color'] = get_grade_color(overall_result['overall_grade'])
+        overall_result['status_color'] = get_result_status_color(overall_result['is_pass'])
+        
+        # Add color classes to subject results
+        for subject in overall_result['subject_results']:
+            subject['grade_color'] = get_grade_color(subject['grade'])
+        
+        # Create student object with results
+        student_data = {
+            'id': student.id,
+            'name': student.name,
+            'roll_no': student.roll_no,
+            'cls': student.cls,
+            'section': student.section,
+            'overall_result': overall_result
+        }
+        
+        students_data.append(student_data)
+    
+    # Sort students by class and roll number
+    students_data.sort(key=lambda x: (x['cls'], x['roll_no']))
+    
+    return render_template('view_result.html', students=students_data)
+
+@app.route('/student/<int:student_id>')
+def student_detail(student_id):
+    """View detailed result for a specific student"""
+    student = Student.query.get_or_404(student_id)
+    results = Result.query.filter_by(student_id=student.id).all()
+    overall_result = calculate_student_overall_result(results)
+    
+    # Add color classes
+    overall_result['grade_color'] = get_grade_color(overall_result['overall_grade'])
+    overall_result['status_color'] = get_result_status_color(overall_result['is_pass'])
+    
+    for subject in overall_result['subject_results']:
+        subject['grade_color'] = get_grade_color(subject['grade'])
+    
+    return render_template('student_detail.html', 
+                         student=student, 
+                         overall_result=overall_result)
 
 if __name__ == '__main__':
     init_database()

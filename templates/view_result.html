@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Results - Result System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-green-50 min-h-screen">
+    <div class="container mx-auto p-6">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600 mb-2">
+                📊 Student Results
+            </h1>
+            <p class="text-gray-600">View and search student results</p>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search Student</label>
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        placeholder="Name or Roll No..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Class</label>
+                    <select id="class-filter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">All Classes</option>
+                        <option value="Mont">Montessori</option>
+                        <option value="Nur">Nursery</option>
+                        <option value="KG">KG</option>
+                        {% for i in range(1, 13) %}
+                            <option value="{{ i }}">Class {{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Section</label>
+                    <select id="section-filter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">All Sections</option>
+                        <option value="A">Section A</option>
+                        <option value="B">Section B</option>
+                        <option value="C">Section C</option>
+                        <option value="D">Section D</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Status</label>
+                    <select id="status-filter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">All Students</option>
+                        <option value="pass">Passed</option>
+                        <option value="fail">Failed</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-between items-center">
+                <button 
+                    id="clear-filters" 
+                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    Clear Filters
+                </button>
+                <div class="text-sm text-gray-600">
+                    Showing <span id="result-count">{{ students|length }}</span> student(s)
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gradient-to-r from-blue-600 to-green-600 text-white">
+                        <tr>
+                            <th class="px-6 py-4 text-left">Student Info</th>
+                            <th class="px-6 py-4 text-center">Class & Section</th>
+                            <th class="px-6 py-4 text-center">Subjects</th>
+                            <th class="px-6 py-4 text-center">Overall</th>
+                            <th class="px-6 py-4 text-center">Status</th>
+                            <th class="px-6 py-4 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-table-body">
+                        {% for student in students %}
+                        <tr class="border-b border-gray-200 hover:bg-gray-50 student-row" 
+                            data-name="{{ student.name.lower() }}"
+                            data-roll="{{ student.roll_no.lower() }}"
+                            data-class="{{ student.cls }}"
+                            data-section="{{ student.section }}"
+                            data-status="{{ 'pass' if student.overall_result.is_pass else 'fail' }}">
+                            
+                            <!-- Student Info -->
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-gradient-to-r from-blue-400 to-green-400 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                                        {{ student.name[0].upper() }}
+                                    </div>
+                                    <div>
+                                        <div class="font-semibold text-gray-900">{{ student.name }}</div>
+                                        <div class="text-sm text-gray-500">Roll: {{ student.roll_no }}</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Class & Section -->
+                            <td class="px-6 py-4 text-center">
+                                <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                    {{ student.cls }}-{{ student.section }}
+                                </div>
+                            </td>
+
+                            <!-- Subjects -->
+                            <td class="px-6 py-4">
+                                <div class="space-y-1">
+                                    {% for subject in student.overall_result.subject_results %}
+                                    <div class="flex items-center justify-between text-sm">
+                                        <span class="text-gray-700">{{ subject.subject_name }}:</span>
+                                        <div class="flex items-center space-x-2">
+                                            <span class="font-medium">{{ subject.marks }}/{{ subject.max_marks }}</span>
+                                            <span class="px-2 py-1 rounded text-xs font-medium {{ subject.grade_color }}">
+                                                {{ subject.grade }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </td>
+
+                            <!-- Overall -->
+                            <td class="px-6 py-4 text-center">
+                                <div class="space-y-2">
+                                    <div class="text-lg font-bold text-gray-900">
+                                        {{ student.overall_result.overall_percentage }}%
+                                    </div>
+                                    <div class="px-3 py-1 rounded-full text-sm font-medium {{ student.overall_result.grade_color }}">
+                                        {{ student.overall_result.overall_grade }}
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Status -->
+                            <td class="px-6 py-4 text-center">
+                                <span class="px-3 py-1 rounded-full text-sm font-medium {{ student.overall_result.status_color }}">
+                                    {{ 'PASS' if student.overall_result.is_pass else 'FAIL' }}
+                                </span>
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex justify-center space-x-2">
+                                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                                        📄 View Details
+                                    </button>
+                                    <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                                        📋 PDF
+                                    </button>
+                                    <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                                        ✏️ Edit
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-12">
+            <div class="text-6xl mb-4">📚</div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">No Results Found</h3>
+            <p class="text-gray-500">Try adjusting your search criteria or add some student results.</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="mt-8 text-center">
+            <a href="/" class="text-blue-600 hover:text-blue-800 font-medium mr-4">← Back to Home</a>
+            <a href="/enter" class="text-green-600 hover:text-green-800 font-medium">Add New Result →</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const classFilter = document.getElementById('class-filter');
+            const sectionFilter = document.getElementById('section-filter');
+            const statusFilter = document.getElementById('status-filter');
+            const clearFiltersBtn = document.getElementById('clear-filters');
+            const resultCount = document.getElementById('result-count');
+            const studentRows = document.querySelectorAll('.student-row');
+            const emptyState = document.getElementById('empty-state');
+            const resultsTable = document.querySelector('.bg-white.rounded-2xl.shadow-lg.overflow-hidden');
+
+            function filterResults() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const classValue = classFilter.value;
+                const sectionValue = sectionFilter.value;
+                const statusValue = statusFilter.value;
+
+                let visibleCount = 0;
+
+                studentRows.forEach(row => {
+                    const name = row.dataset.name;
+                    const roll = row.dataset.roll;
+                    const studentClass = row.dataset.class;
+                    const section = row.dataset.section;
+                    const status = row.dataset.status;
+
+                    const matchesSearch = !searchTerm || name.includes(searchTerm) || roll.includes(searchTerm);
+                    const matchesClass = !classValue || studentClass === classValue;
+                    const matchesSection = !sectionValue || section === sectionValue;
+                    const matchesStatus = !statusValue || status === statusValue;
+
+                    if (matchesSearch && matchesClass && matchesSection && matchesStatus) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                resultCount.textContent = visibleCount;
+
+                // Show/hide empty state
+                if (visibleCount === 0) {
+                    emptyState.classList.remove('hidden');
+                    resultsTable.classList.add('hidden');
+                } else {
+                    emptyState.classList.add('hidden');
+                    resultsTable.classList.remove('hidden');
+                }
+            }
+
+            function clearFilters() {
+                searchInput.value = '';
+                classFilter.value = '';
+                sectionFilter.value = '';
+                statusFilter.value = '';
+                filterResults();
+            }
+
+            // Event listeners
+            searchInput.addEventListener('input', filterResults);
+            classFilter.addEventListener('change', filterResults);
+            sectionFilter.addEventListener('change', filterResults);
+            statusFilter.addEventListener('change', filterResults);
+            clearFiltersBtn.addEventListener('click', clearFilters);
+
+            // Initial filter
+            filterResults();
+        });
+    </script>
+</body>
+</html>

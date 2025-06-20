@@ -1,0 +1,25 @@
+# Ignore Python compiled files
+*.pyc
+__pycache__/
+
+# Ignore database files
+database/*.db
+
+#Ignore virtual environment files
+venv/
+
+
+# Ignore temporary files
+*.tmp
+*.log
+
+# Ignore node_modules (npm may be used later ..)
+node_modules/
+
+# Ignore build artifacts
+dist/
+build/
+
+# Ignore IDE-specific files
+.vscode/
+.idea/

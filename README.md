@@ -15,6 +15,7 @@ Wanna see following thnings in the app at the base:
 <li>Generate Individual MarksheetGenerate PDF Report for Each Class/ Section </li> 
 <li> Save marks to DB </li>
  <li> Conformation Flash Message </li>
+ <li> And Much More Related... </li>
 </ol>
 
 
