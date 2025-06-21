@@ -25,6 +25,25 @@
                 <canvas id="passFailChart" height="200"></canvas>
             </div>
         </div>
+        <!-- Attendance Analytics Card -->
+        <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow mb-8">
+            <h2 class="text-xl font-semibold mb-4">Attendance Overview</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <canvas id="attendanceChart"></canvas>
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-green-50 rounded-lg p-4">
+                        <h4 class="font-medium text-green-800">Good Attendance (≥75%)</h4>
+                        <p class="text-2xl font-bold text-green-600">{{ good_attendance_count }} students</p>
+                    </div>
+                    <div class="bg-red-50 rounded-lg p-4">
+                        <h4 class="font-medium text-red-800">Poor Attendance (<75%)</h4>
+                        <p class="text-2xl font-bold text-red-600">{{ poor_attendance_count }} students</p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Subject Toppers -->
         <div class="bg-white rounded-xl shadow-lg p-4 mb-8">
             <h2 class="text-xl font-semibold mb-4">Subject Toppers</h2>
@@ -64,6 +83,8 @@
         const classAvgData = JSON.parse('{{ class_avg_data|tojson|safe if class_avg_data is defined else "[]" }}');
         const passCount = Number('{{ pass_count|default(0) }}');
         const failCount = Number('{{ fail_count|default(0) }}');
+        const goodAttendance = Number('{{ good_attendance_count|default(0) }}');
+        const poorAttendance = Number('{{ poor_attendance_count|default(0) }}');
 
         // Defensive: Only render charts if canvas exists and data is array
         document.addEventListener('DOMContentLoaded', function() {
@@ -103,6 +124,29 @@
                     options: {
                         responsive: true,
                         plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }
+
+            var attendanceChartElem = document.getElementById('attendanceChart');
+            if (attendanceChartElem) {
+                var ctx3 = attendanceChartElem.getContext('2d');
+                new Chart(ctx3, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Good Attendance (≥75%)', 'Poor Attendance (<75%)'],
+                        datasets: [{
+                            data: [goodAttendance, poorAttendance],
+                            backgroundColor: ['#22c55e', '#ef4444']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
                     }
                 });
             }

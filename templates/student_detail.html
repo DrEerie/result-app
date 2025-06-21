@@ -25,6 +25,12 @@
                     <h2 class="text-2xl font-bold text-gray-800">{{ student.name }}</h2>
                     <p class="text-gray-600">Roll No: {{ student.roll_no }}</p>
                     <p class="text-gray-600">Class: {{ student.cls }}-{{ student.section }}</p>
+                    
+                    <!-- Attendance Info -->
+                    <div class="mt-4 {{ 'text-green-600' if (student.days_present / student.max_days * 100) >= 75 else 'text-red-600' }}">
+                        <p class="font-medium">Attendance: {{ student.days_present }}/{{ student.max_days }} days
+                        ({{ "%.1f"|format(student.days_present / student.max_days * 100) }}%)</p>
+                    </div>
                 </div>
                 <div class="ml-auto">
                     <a href="{{ url_for('download_pdf', student_id=student.id) }}" 

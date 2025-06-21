@@ -13,179 +13,132 @@
             <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600 mb-2">
                 Subject Management
             </h1>
-            <p class="text-gray-600">Configure subjects for each class</p>
-        </div>
-
-        <!-- Centered Class Selection -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <label class="block text-lg font-medium text-gray-700 mb-4 text-center">Select Class</label>
-            <select id="classSelect" 
-                    class="w-full max-w-md mx-auto block px-4 py-3 rounded-lg border-2 border-gray-200 
-                           focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all">
-                <option value="">Choose a class...</option>
-                {% for cls in classes %}
-                    <option value="{{ cls }}">Class {{ cls }}</option>
-                {% endfor %}
-            </select>
+            <p class="text-gray-600">Configure subjects and attendance for each class</p>
         </div>
 
         <!-- Subject Management Section -->
-        <div id="subjectSection" class="hidden bg-white rounded-xl shadow-lg p-6">
-            <div id="loadingState" class="text-center py-8 hidden">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                <p class="text-gray-600">Loading subjects...</p>
-            </div>
-
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
             <form id="subjectForm" method="POST" class="space-y-6">
-                <input type="hidden" name="class_name" id="selectedClass">
-                
-                <div id="subjectList" class="space-y-4">
-                    <!-- Subjects will be added here -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Class *</label>
+                        <select name="class_name" id="classSelect" required
+                                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                            <option value="">Choose a class...</option>
+                            {% for cls in classes %}
+                                <option value="{{ cls }}">Class {{ cls }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 mb-2">Maximum Attendance Days *</label>
+                        <input type="number" name="max_days" id="maxDaysInput"
+                               class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200"
+                               value="200"
+                               min="1" max="366" required>
+                        <p class="text-sm text-gray-500 mt-1">Set total academic days for attendance</p>
+                    </div>
                 </div>
 
-                <div class="flex justify-center mt-6">
-                    <button type="button" id="addSubject" 
-                            class="inline-flex items-center px-4 py-2 border-2 border-blue-500 text-blue-500 
-                                   rounded-lg hover:bg-blue-50 transition-all">
-                        <span class="text-xl mr-2">+</span>
-                        Add Subject
+                <div id="subjectList" class="space-y-4 mt-8">
+                    <!-- Subjects will be loaded here -->
+                    <div class="text-center text-gray-500 py-8">
+                        Please select a class to manage subjects
+                    </div>
+                </div>
+
+                <div class="flex justify-center space-x-4 mt-6">
+                    <button type="button" id="addSubject"
+                            class="bg-blue-100 text-blue-600 px-6 py-2 rounded-lg hover:bg-blue-200 transition-all">
+                        + Add Subject
                     </button>
-                </div>
-
-                <div class="flex justify-center mt-8">
-                    <button type="submit" 
-                            class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600
-                                   transition-all flex items-center">
-                        <span class="text-xl mr-2">💾</span>
-                        Save Changes
+                    <button type="submit"
+                            class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-all">
+                        💾 Save Changes
                     </button>
                 </div>
             </form>
+        </div>
+
+        <!-- Navigation -->
+        <div class="text-center">
+            <a href="/" class="text-blue-600 hover:text-blue-800 font-medium">← Back to Home</a>
         </div>
     </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const classSelect = document.getElementById('classSelect');
-            const subjectSection = document.getElementById('subjectSection');
+            const maxDaysInput = document.getElementById('maxDaysInput');
             const subjectList = document.getElementById('subjectList');
             const addSubjectBtn = document.getElementById('addSubject');
-            const selectedClassInput = document.getElementById('selectedClass');
-            const loadingState = document.getElementById('loadingState');
 
-            async function loadSubjects(className) {
-                // Show loading state
-                loadingState.classList.remove('hidden');
-                subjectList.classList.add('hidden');
-                subjectSection.classList.remove('hidden');
-
-                try {
-                    const response = await fetch(`/api/subjects/${className}`);
-                    if (!response.ok) throw new Error('Failed to fetch subjects');
-                    
-                    const subjects = await response.json();
-                    
-                    if ('error' in subjects) {
-                        throw new Error(subjects.error);
-                    }
-
-                    subjectList.innerHTML = '';
-                    
-                    if (subjects.length === 0) {
-                        subjectList.innerHTML = `
-                            <div class="text-center py-8 text-gray-500">
-                                <p>No subjects configured for Class ${className}</p>
-                            </div>
-                        `;
-                    } else {
-                        subjects.forEach(subject => {
-                            subjectList.appendChild(createSubjectEntry(subject));
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error loading subjects:', error);
-                    subjectList.innerHTML = `
-                        <div class="text-center py-8 text-red-500">
-                            <p>Error loading subjects: ${error.message}</p>
-                            <button onclick="retryLoad('${className}')" 
-                                    class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg">
-                                Retry
-                            </button>
-                        </div>
-                    `;
-                } finally {
-                    loadingState.classList.add('hidden');
-                    subjectList.classList.remove('hidden');
-                }
-            }
-
-            function retryLoad(className) {
-                loadSubjects(className);
-            }
-
-            function removeSubject(button) {
-                const subjectEntry = button.closest('.bg-gray-50');
-                if (subjectEntry) {
-                    subjectEntry.classList.add('opacity-0', 'scale-95');
-                    setTimeout(() => {
-                        subjectEntry.remove();
-                    }, 200);
-                }
-            }
-
-            // Make removeSubject available globally
-            window.removeSubject = removeSubject;
-
-            function createSubjectEntry(subject = { name: '', max_marks: 100 }) {
-                const div = document.createElement('div');
-                div.className = 'bg-gray-50 p-4 rounded-lg border-2 border-gray-200 hover:border-blue-300 transition-all duration-200';
-                div.innerHTML = `
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                        <div class="md:col-span-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Subject Name</label>
-                            <input type="text" name="subject_names[]" 
-                                   value="${subject.name}"
-                                   class="w-full px-4 py-2 rounded-lg border-2 border-gray-200 
-                                          focus:border-blue-500 focus:ring focus:ring-blue-200" 
-                                   placeholder="Enter subject name" required>
-                        </div>
-                        <div class="md:col-span-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Maximum Marks</label>
-                            <input type="number" name="max_marks[]" 
-                                   value="${subject.max_marks}"
-                                   class="w-full px-4 py-2 rounded-lg border-2 border-gray-200 
-                                          focus:border-blue-500 focus:ring focus:ring-blue-200" 
-                                   min="0" step="1" required>
-                        </div>
-                        <div class="md:col-span-2 flex justify-center md:justify-end">
-                            <button type="button" 
-                                    onclick="removeSubject(this)"
-                                    class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50
-                                           transition-all">
-                                <span class="text-xl">×</span>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                return div;
-            }
-
-            classSelect.addEventListener('change', () => {
+            // Load class settings and subjects when class is selected
+            classSelect.addEventListener('change', async () => {
                 const selectedClass = classSelect.value;
                 if (!selectedClass) {
-                    subjectSection.classList.add('hidden');
+                    subjectList.innerHTML = `
+                        <div class="text-center text-gray-500 py-8">
+                            Please select a class to manage subjects
+                        </div>`;
                     return;
                 }
 
-                selectedClassInput.value = selectedClass;
-                subjectSection.classList.remove('hidden');
-                loadSubjects(selectedClass);
+                try {
+                    // Load class settings
+                    const settingsResponse = await fetch(`/api/class_settings/${selectedClass}`);
+                    const settings = await settingsResponse.json();
+                    maxDaysInput.value = settings.max_days;
+
+                    // Load subjects
+                    const subjectsResponse = await fetch(`/api/subjects/${selectedClass}`);
+                    const subjects = await subjectsResponse.json();
+                    
+                    subjectList.innerHTML = '';
+                    subjects.forEach(subject => addSubjectRow(subject));
+                    
+                    if (subjects.length === 0) {
+                        addSubjectRow();
+                    }
+                } catch (error) {
+                    console.error('Error loading class data:', error);
+                    subjectList.innerHTML = `
+                        <div class="text-center text-red-500 py-8">
+                            Error loading class data. Please try again.
+                        </div>`;
+                }
             });
 
-            addSubjectBtn.addEventListener('click', () => {
-                subjectList.appendChild(createSubjectEntry());
-            });
+            // Add new subject row
+            addSubjectBtn.addEventListener('click', () => addSubjectRow());
+
+            function addSubjectRow(subject = { name: '', max_marks: 100 }) {
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-12 gap-4 items-center bg-gray-50 p-4 rounded-lg';
+                row.innerHTML = `
+                    <div class="col-span-5">
+                        <input type="text" name="subject_names[]"
+                               class="w-full px-4 py-2 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200"
+                               placeholder="Subject Name" value="${subject.name}" required>
+                    </div>
+                    <div class="col-span-5">
+                        <input type="number" name="max_marks[]"
+                               class="w-full px-4 py-2 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200"
+                               placeholder="Maximum Marks" value="${subject.max_marks}" min="0" required>
+                    </div>
+                    <div class="col-span-2 text-center">
+                        <button type="button" onclick="this.closest('.grid').remove()"
+                                class="text-red-500 hover:text-red-700">
+                            <span class="text-xl">×</span>
+                        </button>
+                    </div>
+                `;
+                subjectList.appendChild(row);
+            }
         });
     </script>
+
+    {% include '_footer.html' %}
 </body>
 </html>

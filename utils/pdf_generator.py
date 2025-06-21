@@ -31,8 +31,10 @@ def generate_result_pdf(student_data, save_path):
     student_info = [
         ['Name:', student_data['name']],
         ['Roll No:', student_data['roll_no']],
-        ['Class:', f"{student_data['cls']}-{student_data['section']}"]
+        ['Class:', f"{student_data['cls']}-{student_data['section']}"],
+        ['Attendance:', f"{student_data['days_present']}/{student_data['max_days']} days ({(student_data['days_present']/student_data['max_days']*100):.1f}%)"]
     ]
+    
     info_table = Table(student_info, colWidths=[100, 300])
     info_table.setStyle(TableStyle([
         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
@@ -80,6 +82,20 @@ def generate_result_pdf(student_data, save_path):
     ]))
     elements.append(overall_table)
 
+    # Attendance Info
+    attendance_data = [
+        ['Attendance:', f"{student_data['days_present']}/{student_data['max_days']} days"],
+        ['Attendance Percentage:', f"{(student_data['days_present'] / student_data['max_days'] * 100):.1f}%"]
+    ]
+    attendance_table = Table(attendance_data, colWidths=[150, 150])
+    attendance_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey)
+    ]))
+    elements.append(attendance_table)
+
     # Add school logo/header
     elements.append(Spacer(1, 30))
     
@@ -98,7 +114,7 @@ def generate_result_pdf(student_data, save_path):
 
 def generate_class_pdf(class_data, save_path):
     """Generate PDF result for an entire class"""
-    doc = SimpleDocTemplate(save_path, pagesize=A4)
+    doc = SimpleDocTemplate(save_path, pagesize=A4, leftMargin=20, rightMargin=20)
     styles = getSampleStyleSheet()
     elements = []
     
@@ -111,23 +127,25 @@ def generate_class_pdf(class_data, save_path):
     )
     elements.append(Paragraph(f"Class {class_data['cls']}-{class_data['section']} Results", header_style))
     
-    # Table header
-    table_data = [['Roll No', 'Name', 'Total Marks', 'Percentage', 'Grade', 'Status']]
+    # Table header with attendance columns
+    table_data = [['Roll No', 'Name', 'Attendance', 'Total Marks', 'Percentage', 'Grade', 'Status']]
     
     # Add student rows
     for student in sorted(class_data['students'], key=lambda x: x['roll_no']):
         result = student['overall_result']
+        attendance_str = f"{student.get('days_present', 0)}/{student.get('max_days', 200)} ({(student.get('days_present', 0)/student.get('max_days', 200)*100):.1f}%)"
         table_data.append([
             student['roll_no'],
             student['name'],
+            attendance_str,
             f"{result['total_marks']}/{result['total_max_marks']}",
             f"{result['overall_percentage']}%",
             result['overall_grade'],
             'PASS' if result['is_pass'] else 'FAIL'
         ])
     
-    # Create and style table
-    table = Table(table_data, colWidths=[60, 150, 80, 70, 50, 50])
+    # Create and style table with adjusted column widths
+    table = Table(table_data, colWidths=[50, 120, 100, 80, 70, 50, 50])
     table.setStyle(TableStyle([
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('FONTSIZE', (0, 0), (-1, -1), 10),

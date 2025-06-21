@@ -9,6 +9,8 @@ class Student(db.Model):
     name = db.Column(db.String(100), nullable=False)
     cls = db.Column(db.String(20), nullable=False)
     section = db.Column(db.String(5), nullable=False)
+    days_present = db.Column(db.Integer, default=0)
+    max_days = db.Column(db.Integer, default=200)  # Default academic year days
 
     results = db.relationship('Result', backref='student', lazy=True)
 
@@ -34,6 +36,11 @@ class Result(db.Model):
                        default=lambda: f"{datetime.now().year}-{datetime.now().year + 1}")
     marks = db.Column(db.Float, nullable=False)
     max_marks = db.Column(db.Float, default=100.0)
+
+class ClassSettings(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    class_name = db.Column(db.String(20), unique=True, nullable=False)
+    max_days = db.Column(db.Integer, default=200)
 
 # Add migration helper
 def init_db(app):

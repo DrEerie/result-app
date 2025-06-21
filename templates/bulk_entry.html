@@ -77,8 +77,14 @@
                 }
 
                 try {
-                    const response = await fetch(`/api/subjects/${selectedClass}`);
-                    const subjects = await response.json();
+                    // Load both subjects and class settings
+                    const [subjectsResponse, settingsResponse] = await Promise.all([
+                        fetch(`/api/subjects/${selectedClass}`),
+                        fetch(`/api/class_settings/${selectedClass}`)
+                    ]);
+                    
+                    const subjects = await subjectsResponse.json();
+                    const settings = await settingsResponse.json();
                     
                     const studentDiv = document.createElement('div');
                     studentDiv.className = 'gradient-border p-4 rounded-lg mb-4 relative';
@@ -102,12 +108,24 @@
                                 <label class="block text-gray-700 mb-2">Roll No *</label>
                                 <input type="text" name="roll_no[]" required class="w-full rounded p-2 border">
                             </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Days Present *</label>
+                                <input type="number" 
+                                       name="days_present_${studentCount}"
+                                       class="w-full rounded p-2 border"
+                                       min="0" 
+                                       max="${settings.max_days}"
+                                       value="0"
+                                       required>
+                                <p class="text-sm text-gray-500">Maximum: ${settings.max_days} days</p>
+                            </div>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                             ${subjects.map(subject => `
                                 <div>
                                     <label class="block text-gray-700 mb-2">${subject.name} (Max: ${subject.max_marks})</label>
-                                    <input type="number" name="marks_${studentCount}_${subject.name.toLowerCase().replace(/\s+/g, '_')}"
+                                    <input type="number" 
+                                           name="marks_${studentCount}_${subject.name.toLowerCase().replace(/\s+/g, '_')}"
                                            class="w-full rounded p-2 border" 
                                            min="0" max="${subject.max_marks}" step="0.5">
                                 </div>

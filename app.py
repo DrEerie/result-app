@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify
-from models.models import db, Student, Subject, Result, init_db
+from models.models import db, Student, Subject, Result, init_db, ClassSettings
 from utils.grading import calculate_student_overall_result, get_grade_color, get_result_status_color
 from utils.pdf_generator import generate_result_pdf, generate_class_pdf
 from datetime import datetime
@@ -70,39 +70,64 @@ def enter_result():
             roll_no = request.form.get('roll_no', '').strip()
             cls = request.form.get('cls', '').strip()
             section = request.form.get('section', '').strip()
+            days_present = int(request.form.get('days_present', 0))
             action = request.form.get('action_type', 'insert')
+
+            # Get max_days from class settings
+            class_settings = ClassSettings.query.filter_by(class_name=cls).first()
+            max_days = class_settings.max_days if class_settings else 200
             
             # Validation
             if not all([name, roll_no, cls, section]):
                 flash("All fields are required!", "error")
-                return render_template('enter_result.html', 
-                                     class_subjects=CLASS_SUBJECTS,
-                                     prefill=request.form)
+                return render_template('enter_result.html', prefill=request.form)
+
+            try:
+                if days_present < 0 or days_present > max_days:
+                    raise ValueError
+            except ValueError:
+                flash(f"Days present must be between 0 and {max_days}", "error")
+                return render_template('enter_result.html', prefill=request.form)
             
             # Check if student exists
             existing_student = Student.query.filter_by(roll_no=roll_no).first()
             
             if existing_student and action == 'insert':
-                flash(f"Roll number {roll_no} already exists! Choose overwrite or delete.", "warning")
                 return render_template('enter_result.html', 
-                                     class_subjects=CLASS_SUBJECTS,
                                      existing_roll=roll_no, 
                                      prefill=request.form)
-            
+
             # Handle different actions
             if existing_student:
                 if action == 'delete':
                     delete_student(existing_student)
-                    student = Student(name=name, roll_no=roll_no, cls=cls, section=section)
+                    student = Student(
+                        name=name, 
+                        roll_no=roll_no, 
+                        cls=cls, 
+                        section=section,
+                        days_present=days_present,
+                        max_days=max_days
+                    )
                     db.session.add(student)
                 elif action == 'overwrite':
-                    student = overwrite_student(existing_student, name, cls, section)
-                else:
+                    existing_student.name = name
+                    existing_student.cls = cls
+                    existing_student.section = section
+                    existing_student.days_present = days_present
+                    existing_student.max_days = max_days
                     student = existing_student
             else:
-                student = Student(name=name, roll_no=roll_no, cls=cls, section=section)
+                student = Student(
+                    name=name, 
+                    roll_no=roll_no, 
+                    cls=cls, 
+                    section=section,
+                    days_present=days_present,
+                    max_days=max_days
+                )
                 db.session.add(student)
-            
+
             db.session.commit()
             
             # Add results
@@ -192,13 +217,15 @@ def view_results():
         for subject in overall_result['subject_results']:
             subject['grade_color'] = get_grade_color(subject['grade'])
         
-        # Create student object with results
+        # Create student object with results and attendance
         student_data = {
             'id': student.id,
             'name': student.name,
             'roll_no': student.roll_no,
             'cls': student.cls,
             'section': student.section,
+            'days_present': student.days_present,
+            'max_days': student.max_days,
             'overall_result': overall_result
         }
         
@@ -239,6 +266,8 @@ def download_pdf(student_id):
         'roll_no': student.roll_no,
         'cls': student.cls,
         'section': student.section,
+        'days_present': student.days_present,
+        'max_days': student.max_days,
         'overall_result': overall_result
     }
     
@@ -263,6 +292,10 @@ def bulk_entry():
         cls = request.form.get('cls')
         section = request.form.get('section')
         
+        # Get class settings for max_days
+        class_settings = ClassSettings.query.filter_by(class_name=cls).first()
+        max_days = class_settings.max_days if class_settings else 200
+        
         # Get student data from form
         roll_numbers = request.form.getlist('roll_no[]')
         names = request.form.getlist('name[]')
@@ -270,6 +303,12 @@ def bulk_entry():
         success_count = 0
         for i in range(len(roll_numbers)):
             try:
+                # Get attendance for this student
+                days_present = int(request.form.get(f'days_present_{i}', 0))
+                if days_present < 0 or days_present > max_days:
+                    flash(f"Invalid attendance for student {names[i]}", "error")
+                    continue
+                
                 # Create or update student
                 student = Student.query.filter_by(roll_no=roll_numbers[i]).first()
                 if not student:
@@ -277,24 +316,30 @@ def bulk_entry():
                         roll_no=roll_numbers[i],
                         name=names[i],
                         cls=cls,
-                        section=section
+                        section=section,
+                        days_present=days_present,
+                        max_days=max_days
                     )
                     db.session.add(student)
                     db.session.flush()
+                else:
+                    student.days_present = days_present
+                    student.max_days = max_days
                 
                 # Add results for each subject
                 for subject_name in CLASS_SUBJECTS.get(cls, []):
                     marks_key = f"marks_{i}_{subject_name.lower().replace(' ', '_')}"
                     marks = request.form.get(marks_key)
                     if marks and marks.strip():
-                        subject = Subject.query.filter_by(name=subject_name).first()
-                        result = Result(
-                            student_id=student.id,
-                            subject_id=subject.id,
-                            marks=float(marks),
-                            term='Annual'
-                        )
-                        db.session.add(result)
+                        subject = Subject.query.filter_by(name=subject_name, class_name=cls).first()
+                        if subject:
+                            result = Result(
+                                student_id=student.id,
+                                subject_id=subject.id,
+                                marks=float(marks),
+                                term='Annual'
+                            )
+                            db.session.add(result)
                 success_count += 1
             except Exception as e:
                 flash(f"Error adding student {names[i]}: {str(e)}", "error")
@@ -326,6 +371,8 @@ def download_class_pdf(cls, section):
         class_data['students'].append({
             'name': student.name,
             'roll_no': student.roll_no,
+            'days_present': student.days_present,
+            'max_days': student.max_days,
             'overall_result': overall_result
         })
     
@@ -363,13 +410,23 @@ def edit_result(student_id):
     
     if request.method == 'POST':
         try:
+            # Update attendance
+            days_present = request.form.get('days_present', type=int)
+            if days_present is not None:
+                if 0 <= days_present <= student.max_days:
+                    student.days_present = days_present
+                else:
+                    flash(f"Days present must be between 0 and {student.max_days}", "error")
+                    return redirect(url_for('edit_result', student_id=student_id))
+
+            # Update subject marks
             for subject in class_subjects:
                 marks_key = f'marks_{subject.id}'
                 marks_str = request.form.get(marks_key, '').strip()
                 
-                if marks_str:  # Only process if marks were entered
+                if marks_str:
                     marks = float(marks_str)
-                    if 0 <= marks <= subject.max_marks:  # Use subject's max_marks
+                    if 0 <= marks <= subject.max_marks:
                         result = Result.query.filter_by(
                             student_id=student_id,
                             subject_id=subject.id
@@ -377,7 +434,6 @@ def edit_result(student_id):
                             student_id=student_id,
                             subject_id=subject.id
                         )
-                        
                         result.marks = marks
                         if result.id is None:
                             db.session.add(result)
@@ -390,7 +446,7 @@ def edit_result(student_id):
             return redirect(url_for('view_results'))
             
         except ValueError:
-            flash("Invalid marks entered", "error")
+            flash("Invalid values entered", "error")
             return redirect(url_for('edit_result', student_id=student_id))
     
     return render_template('edit_result.html', 
@@ -401,10 +457,13 @@ def edit_result(student_id):
 @app.route('/analytics')
 def analytics():
     """Show result analytics with charts"""
-    # Gather data for analytics
     students = Student.query.all()
     subjects = Subject.query.all()
     results = Result.query.all()
+
+    # Calculate attendance statistics
+    good_attendance_count = sum(1 for s in students if (s.days_present / s.max_days * 100) >= 75)
+    poor_attendance_count = len(students) - good_attendance_count
 
     # Class-wise average marks
     class_averages = {}
@@ -414,6 +473,7 @@ def analytics():
         count = len(student_results)
         if count:
             class_averages.setdefault(student.cls, []).append(total / count)
+    
     class_avg_data = [
         {"cls": cls, "avg": round(sum(vals)/len(vals), 2) if vals else 0}
         for cls, vals in class_averages.items()
@@ -453,7 +513,9 @@ def analytics():
         class_avg_data=class_avg_data,
         subject_toppers=subject_toppers,
         pass_count=pass_count,
-        fail_count=fail_count
+        fail_count=fail_count,
+        good_attendance_count=good_attendance_count,
+        poor_attendance_count=poor_attendance_count
     )
 
 @app.route('/export_excel')
@@ -470,6 +532,7 @@ def export_excel():
     # Header
     ws.append([
         "Roll No", "Name", "Class", "Section", 
+        "Days Present", "Max Days", "Attendance %",
         "Subject", "Marks Obtained", "Maximum Marks", 
         "Percentage", "Grade", "Status"
     ])
@@ -478,12 +541,17 @@ def export_excel():
     for student in students:
         results = Result.query.filter_by(student_id=student.id).all()
         overall = calculate_student_overall_result(results)
+        attendance_percent = (student.days_present / student.max_days * 100)
+        
         for subject_result in overall['subject_results']:
             ws.append([
                 student.roll_no,
                 student.name,
                 student.cls,
                 student.section,
+                student.days_present,
+                student.max_days,
+                f"{attendance_percent:.1f}%",
                 subject_result['subject_name'],
                 subject_result['marks'],
                 subject_result['max_marks'],
@@ -510,8 +578,16 @@ def manage_subjects():
         class_name = request.form.get('class_name')
         subject_names = request.form.getlist('subject_names[]')
         max_marks = request.form.getlist('max_marks[]')
+        max_days = request.form.get('max_days', 200, type=int)
 
         try:
+            # Update class settings
+            settings = ClassSettings.query.filter_by(class_name=class_name).first()
+            if not settings:
+                settings = ClassSettings(class_name=class_name)
+                db.session.add(settings)
+            settings.max_days = max_days
+
             # Remove old subjects for this class
             Subject.query.filter_by(class_name=class_name).delete()
 
@@ -526,16 +602,20 @@ def manage_subjects():
                     db.session.add(subject)
 
             db.session.commit()
-            flash('Subjects updated successfully!', 'success')
+            flash('Settings and subjects updated successfully!', 'success')
         except Exception as e:
             db.session.rollback()
-            flash(f'Error updating subjects: {str(e)}', 'error')
+            flash(f'Error updating settings: {str(e)}', 'error')
 
         return redirect(url_for('manage_subjects'))
 
-    # For GET request, get all available classes
-    classes = list(CLASS_SUBJECTS.keys())  # Use the predefined classes
-    return render_template('manage_subjects.html', classes=classes)
+    # For GET request, get all classes and their settings
+    classes = list(CLASS_SUBJECTS.keys())
+    class_settings = {s.class_name: s.max_days for s in ClassSettings.query.all()}
+    
+    return render_template('manage_subjects.html', 
+                         classes=classes,
+                         class_settings=class_settings)
 
 # Ensure this route is also present
 @app.route('/api/subjects/<class_name>')
@@ -550,14 +630,32 @@ def get_class_subjects(class_name):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/class_settings/<class_name>')
+def get_class_settings(class_name):
+    """API endpoint to get settings for a class"""
+    try:
+        settings = ClassSettings.query.filter_by(class_name=class_name).first()
+        return jsonify({
+            'max_days': settings.max_days if settings else 200
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 def init_database():
     """Initialize database with tables and default subjects"""
     with app.app_context():
         try:
-            # Create all tables
+            # Only create tables that don't exist
             db.create_all()
             
-            # Add default subjects for each class
+            # Add default class settings if they don't exist
+            for cls in CLASS_SUBJECTS.keys():
+                settings = ClassSettings.query.filter_by(class_name=cls).first()
+                if not settings:
+                    settings = ClassSettings(class_name=cls, max_days=200)
+                    db.session.add(settings)
+            
+            # Add default subjects for each class if they don't exist
             for cls, subjects in CLASS_SUBJECTS.items():
                 for subject_name in subjects:
                     existing = Subject.query.filter_by(
@@ -581,6 +679,5 @@ def init_database():
             print(f"Database initialization failed: {str(e)}")
 
 if __name__ == '__main__':
-    with app.app_context():
-        init_database()
+    init_database()  # Single initialization point
     app.run(debug=True)
