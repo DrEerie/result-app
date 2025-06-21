@@ -1,38 +1,509 @@
-<footer class="bg-white border-t border-gray-100 mt-16">
-    <div class="container mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- About -->
-            <div>
-                <h3 class="font-bold text-lg mb-4">About Result System</h3>
-                <p class="text-gray-600">
-                    A comprehensive solution for managing student results with features like bulk entry, 
-                    individual entry, and detailed result analysis.
-                </p>
-            </div>
+<!DOCTYPE html>
+<html lang="en">
 
-            <!-- Quick Links -->
-            <div>
-                <h3 class="font-bold text-lg mb-4">Quick Links</h3>
-                <ul class="space-y-2">
-                    <li><a href="/enter" class="text-gray-600 hover:text-blue-600">Enter Results</a></li>
-                    <li><a href="/bulk_entry" class="text-gray-600 hover:text-blue-600">Bulk Entry</a></li>
-                    <li><a href="/view" class="text-gray-600 hover:text-blue-600">View Results</a></li>
-                    <li><a href="/about" class="text-gray-600 hover:text-blue-600">About Us</a></li>
-                </ul>
-            </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduResult - Modern Enhanced Footer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @keyframes float {
 
-            <!-- Contact -->
-            <div>
-                <h3 class="font-bold text-lg mb-4">Contact & Support</h3>
-                <ul class="space-y-2 text-gray-600">
-                    <li>📧 support@resultapp.com</li>
-                    <li>📞 (123) 456-7890</li>
-                </ul>
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+            }
+        }
+
+        @keyframes gradientShift {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .animate-glow {
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        .gradient-animate {
+            background-size: 200% 200%;
+            animation: gradientShift 4s ease infinite;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .social-icon {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .social-icon:hover::before {
+            left: 100%;
+        }
+
+        .scroll-to-top {
+            transition: all 0.3s ease;
+        }
+
+        .scroll-to-top:hover {
+            transform: translateY(-3px) scale(1.1);
+        }
+
+        /* Fix for bottom section alignment on desktop */
+        .footer-bottom {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .footer-bottom {
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                gap: 2rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Footer -->
+    <footer class="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
+        <!-- Animated Background Elements -->
+        <div class="absolute inset-0 opacity-10">
+            <div
+                class="absolute inset-0 bg-gradient-to-r from-violet-600/20 via-purple-600/20 to-cyan-600/20 gradient-animate">
+            </div>
+            <div
+                class="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-violet-500/20 to-transparent rounded-full blur-3xl animate-float">
+            </div>
+            <div class="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-cyan-500/20 to-transparent rounded-full blur-3xl animate-float"
+                style="animation-delay: 2s;"></div>
+            <div
+                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full blur-2xl animate-pulse">
             </div>
         </div>
 
-        <div class="border-t border-gray-100 mt-8 pt-8 text-center text-gray-600">
-            <p>&copy; 2024 School Result System. All rights reserved.</p>
+        <!-- Wave Effect -->
+        <div class="absolute top-0 left-0 w-full overflow-hidden">
+            <svg class="relative block w-full h-16" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path
+                    d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z"
+                    opacity=".25" fill="currentColor" class="text-white"></path>
+                <path
+                    d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z"
+                    opacity=".5" fill="currentColor" class="text-white"></path>
+                <path
+                    d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z"
+                    fill="currentColor" class="text-white"></path>
+            </svg>
         </div>
-    </div>
-</footer>
+
+        <!-- Main Footer Content -->
+        <div class="relative z-10 pt-20 pb-8">
+            <div class="container mx-auto px-4">
+                <!-- Top Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12 mb-12">
+
+                    <!-- Company Info -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="flex items-center space-x-3">
+                            <div
+                                class="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center animate-glow">
+                                <i
+                                    class="fas fa-graduation-cap text-white text-xl group-hover:rotate-12 transition-transform duration-300"></i>
+                            </div>
+                            <div>
+                                <h3
+                                    class="text-xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+                                    EduResult
+                                </h3>
+                                <p class="text-xs text-slate-400">Powered by Dr Eeerie Wonka </p>
+                            </div>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Building innovative educational solutions with modern technology.
+                            Excellence in every line of code.
+                        </p>
+
+                        <!-- Social Media Icons -->
+                        <div class="flex space-x-4">
+                            <a href="#"
+                                class="social-icon w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center hover:from-blue-400 hover:to-blue-500">
+                                <i class="fab fa-facebook-f text-white text-sm"></i>
+                            </a>
+                            <a href="#"
+                                class="social-icon w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-500 rounded-lg flex items-center justify-center hover:from-sky-400 hover:to-blue-400">
+                                <i class="fab fa-twitter text-white text-sm"></i>
+                            </a>
+                            <a href="#"
+                                class="social-icon w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center hover:from-blue-500 hover:to-blue-600">
+                                <i class="fab fa-linkedin-in text-white text-sm"></i>
+                            </a>
+                            <a href="#"
+                                class="social-icon w-10 h-10 bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg flex items-center justify-center hover:from-gray-600 hover:to-gray-700">
+                                <i class="fab fa-github text-white text-sm"></i>
+                            </a>
+                            <a href="#"
+                                class="social-icon w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-500 rounded-lg flex items-center justify-center hover:from-pink-400 hover:to-rose-400">
+                                <i class="fab fa-instagram text-white text-sm"></i>
+                            </a>
+                            <a href="#"
+                                class="social-icon w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center hover:from-purple-400 hover:to-purple-500">
+                                <i class="fab fa-youtube text-white text-sm"></i>
+                            </a>
+                            <a href="#"
+                                class="social-icon w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center hover:from-yellow-400 hover:to-yellow-500">
+                                <i class="fab fa-globe text-white text-sm"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="space-y-6">
+                        <h4 class="text-lg font-semibold text-white flex items-center">
+                            <i class="fas fa-link mr-2 text-violet-400"></i>
+                            Quick Links
+                        </h4>
+                        <ul class="space-y-3">
+                            <li><a href="#"
+                                    class="text-slate-300 hover:text-violet-400 transition-colors duration-300 flex items-center group">
+                                    <i
+                                        class="fas fa-chevron-right mr-2 text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    Home
+                                </a></li>
+                            <li><a href="#"
+                                    class="text-slate-300 hover:text-violet-400 transition-colors duration-300 flex items-center group">
+                                    <i
+                                        class="fas fa-chevron-right mr-2 text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    About Us
+                                </a></li>
+                            <li><a href="#"
+                                    class="text-slate-300 hover:text-violet-400 transition-colors duration-300 flex items-center group">
+                                    <i
+                                        class="fas fa-chevron-right mr-2 text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    Services
+                                </a></li>
+                            <li><a href="#"
+                                    class="text-slate-300 hover:text-violet-400 transition-colors duration-300 flex items-center group">
+                                    <i
+                                        class="fas fa-chevron-right mr-2 text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    Portfolio
+                                </a></li>
+                            <li><a href="#"
+                                    class="text-slate-300 hover:text-violet-400 transition-colors duration-300 flex items-center group">
+                                    <i
+                                        class="fas fa-chevron-right mr-2 text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    Blog
+                                </a></li>
+                            <li><a href="#"
+                                    class="text-slate-300 hover:text-violet-400 transition-colors duration-300 flex items-center group">
+                                    <i
+                                        class="fas fa-chevron-right mr-2 text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    Contact
+                                </a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Services -->
+                    <div class="space-y-6">
+                        <h4 class="text-lg font-semibold text-white flex items-center">
+                            <i class="fas fa-cogs mr-2 text-cyan-400"></i>
+                            Services
+                        </h4>
+                        <ul class="space-y-3">
+                            <li>
+                                <a href="#"
+                                    class="text-slate-300 hover:text-cyan-400 transition-colors duration-300 flex items-center group">
+                                    <i
+                                        class="fas fa-chevron-right mr-2 text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    Web Development
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                    class="text-slate-300 hover:text-cyan-400 transition-colors duration-300 flex items-center group">
+                                    <i
+                                        class="fas fa-chevron-right mr-2 text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    Python Backend
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                    class="text-slate-300 hover:text-cyan-400 transition-colors duration-300 flex items-center group">
+                                    <i
+                                        class="fas fa-chevron-right mr-2 text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    API Development
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                    class="text-slate-300 hover:text-cyan-400 transition-colors duration-300 flex items-center group">
+                                    <i
+                                        class="fas fa-chevron-right mr-2 text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    Database Design
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                    class="text-slate-300 hover:text-cyan-400 transition-colors duration-300 flex items-center group">
+                                    <i
+                                        class="fas fa-chevron-right mr-2 text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    EdTech Solutions
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                    class="text-slate-300 hover:text-cyan-400 transition-colors duration-300 flex items-center group">
+                                    <i
+                                        class="fas fa-chevron-right mr-2 text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    Student Result Management
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                    class="text-slate-300 hover:text-cyan-400 transition-colors duration-300 flex items-center group">
+                                    <i
+                                        class="fas fa-chevron-right mr-2 text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    Subject & Class Management
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                    class="text-slate-300 hover:text-cyan-400 transition-colors duration-300 flex items-center group">
+                                    <i
+                                        class="fas fa-chevron-right mr-2 text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    Cloud Solutions
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                    class="text-slate-300 hover:text-cyan-400 transition-colors duration-300 flex items-center group">
+                                    <i
+                                        class="fas fa-chevron-right mr-2 text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    Consulting
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Newsletter & Contact -->
+                    <div class="space-y-6">
+                        <!-- Newsletter Signup -->
+                        <div class="glass-effect p-6 rounded-2xl">
+                            <h4 class="text-lg font-semibold text-white mb-4 flex items-center">
+                                <i class="fas fa-envelope mr-2 text-purple-400"></i>
+                                Newsletter
+                            </h4>
+                            <p class="text-slate-300 text-sm mb-4">
+                                Stay updated with our latest news and offers.
+                            </p>
+                            <form class="space-y-3" action="/subscribe" method="POST">
+                                <div class="relative">
+                                    <input type="email" name="email" placeholder="Enter your email"
+                                        class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300"
+                                        required>
+                                    <i class="fas fa-envelope absolute right-3 top-3.5 text-slate-400"></i>
+                                </div>
+                                <button type="submit"
+                                    class="w-full bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
+                                    <i class="fas fa-paper-plane mr-2"></i>
+                                    Subscribe
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Contact Info -->
+                        <div class="space-y-4">
+                            <h4 class="text-lg font-semibold text-white flex items-center">
+                                <i class="fas fa-map-marker-alt mr-2 text-emerald-400"></i>
+                                Contact Info
+                            </h4>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex items-center text-slate-300">
+                                    <i class="fas fa-map-marker-alt mr-3 text-emerald-400 w-4"></i>
+                                    <span>123 Tech Street, Digital City, DC 12345</span>
+                                </div>
+                                <div class="flex items-center text-slate-300">
+                                    <i class="fas fa-phone mr-3 text-blue-400 w-4"></i>
+                                    <span>+1 (555) 123-4567</span>
+                                </div>
+                                <div class="flex items-center text-slate-300">
+                                    <i class="fas fa-envelope mr-3 text-purple-400 w-4"></i>
+                                    <span>hello@yourbrand.com</span>
+                                </div>
+                                <div class="flex items-center text-slate-300">
+                                    <i class="fas fa-clock mr-3 text-yellow-400 w-4"></i>
+                                    <span>Mon - Fri: 9:00 AM - 6:00 PM</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="border-t border-slate-700/50 my-8"></div>
+
+                <!-- Bottom Section -->
+                <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                    <div
+                        class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-slate-400">
+                        <p>&copy; 2025 YourBrand. All rights reserved.</p>
+                        <div class="flex items-center space-x-4">
+                            <a href="#" class="hover:text-violet-400 transition-colors duration-300">Privacy Policy</a>
+                            <span class="text-slate-600">•</span>
+                            <a href="#" class="hover:text-violet-400 transition-colors duration-300">Terms of
+                                Service</a>
+                            <span class="text-slate-600">•</span>
+                            <a href="#" class="hover:text-violet-400 transition-colors duration-300">Cookie Policy</a>
+                        </div>
+                    </div>
+
+                    <!-- Back to Top Button -->
+                    <button onclick="scrollToTop()"
+                        class="scroll-to-top bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl"
+                        title="Back to Top">
+                        <i class="fas fa-arrow-up"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Back to top functionality
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Newsletter form enhancement
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form[action="/subscribe"]');
+            const button = form.querySelector('button[type="submit"]');
+            const originalText = button.innerHTML;
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // Add loading state
+                button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Subscribing...';
+                button.disabled = true;
+
+                // Simulate form submission (replace with actual backend call)
+                setTimeout(() => {
+                    button.innerHTML = '<i class="fas fa-check mr-2"></i>Subscribed!';
+                    button.classList.remove('from-violet-500', 'to-purple-600');
+                    button.classList.add('from-green-500', 'to-emerald-600');
+
+                    // Reset after 3 seconds
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                        button.classList.remove('from-green-500', 'to-emerald-600');
+                        button.classList.add('from-violet-500', 'to-purple-600');
+                        form.reset();
+                    }, 3000);
+                }, 2000);
+            });
+
+            // Social media hover effects
+            const socialIcons = document.querySelectorAll('.social-icon');
+            socialIcons.forEach(icon => {
+                icon.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-3px) rotate(5deg)';
+                });
+
+                icon.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0) rotate(0deg)';
+                });
+            });
+
+            // Smooth reveal animation on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe footer sections for animation
+            const footerSections = document.querySelectorAll('footer > div > div > div > div');
+            footerSections.forEach((section, index) => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(30px)';
+                section.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+                observer.observe(section);
+            });
+        });
+    </script>
+
+</body>
+
+</html>
