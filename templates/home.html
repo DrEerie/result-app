@@ -2,108 +2,161 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Result System - Home</title>
+    <title>School Result System - Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-green-50 min-h-screen">
-    <div class="container mx-auto p-8">
-        <!-- Header -->
-        <div class="text-center mb-12">
-            <h1 class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600 mb-4">
-                🏫 School Result System
+<body class="bg-gradient-to-br from-blue-50 to-green-50 min-h-screen flex flex-col">
+    {% include '_header.html' %}
+
+    <main class="flex-1 w-full">
+        <!-- Hero Section -->
+        <section class="text-center mb-10 px-4 pt-8">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600 mb-4">
+                School Result System
             </h1>
-            <p class="text-xl text-gray-600">Digital Solution for Student Result Management</p>
-        </div>
+            <p class="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+                A comprehensive digital solution for managing student results with advanced features for teachers and administrators.
+            </p>
+            <div class="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+                <a href="/enter" class="inline-block bg-gradient-to-r from-blue-600 to-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:scale-105 transition-all text-base">
+                    Enter Results
+                </a>
+                <a href="/bulk_entry" class="inline-block bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-semibold hover:scale-105 transition-all text-base">
+                    Bulk Entry
+                </a>
+            </div>
+        </section>
 
-        <!-- Feature Cards -->
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <!-- Enter Results -->
-            <div class="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-gray-100">
-                <div class="text-center">
-                    <div class="text-6xl mb-4">✏️</div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Enter Results</h3>
-                    <p class="text-gray-600 mb-6">Add student marks for different subjects and classes</p>
-                    <a href="/enter" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transform hover:scale-105 transition-all duration-200 inline-block">
-                        Start Entry
-                    </a>
-                </div>
+        <!-- Feature Cards Section -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 max-w-7xl mx-auto mb-12">
+            <!-- Result Entry Card -->
+            <div class="feature-card">
+                <div class="text-4xl mb-4">📝</div>
+                <h3 class="text-xl font-bold mb-2">Result Entry</h3>
+                <p class="text-gray-600 mb-4">Enter student results individually with detailed subject marks</p>
+                <a href="/enter" class="card-link">
+                    Enter Results
+                    <span aria-hidden="true">→</span>
+                </a>
             </div>
 
-            <!-- View Results -->
-            <div class="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-gray-100">
-                <div class="text-center">
-                    <div class="text-6xl mb-4">📊</div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">View Results</h3>
-                    <p class="text-gray-600 mb-6">Browse and search student results by class or name</p>
-                    <a href="/view" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transform hover:scale-105 transition-all duration-200 inline-block">
-                        View Results
-                    </a>
-                </div>
+            <!-- Bulk Entry Card -->
+            <div class="feature-card">
+                <div class="text-4xl mb-4">📚</div>
+                <h3 class="text-xl font-bold mb-2">Bulk Entry</h3>
+                <p class="text-gray-600 mb-4">Add multiple student results efficiently in one go</p>
+                <a href="/bulk_entry" class="card-link">
+                    Start Bulk Entry
+                    <span aria-hidden="true">→</span>
+                </a>
             </div>
 
-            <!-- Generate Reports -->
-            <div class="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-gray-100">
-                <div class="text-center">
-                    <div class="text-6xl mb-4">📋</div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Generate Reports</h3>
-                    <p class="text-gray-600 mb-6">Create PDF reports and individual certificates</p>
-                    <button class="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transform hover:scale-105 transition-all duration-200 opacity-50 cursor-not-allowed">
-                        Coming Soon
-                    </button>
-                </div>
+            <!-- View Results Card -->
+            <div class="feature-card">
+                <div class="text-4xl mb-4">👀</div>
+                <h3 class="text-xl font-bold mb-2">View & Edit</h3>
+                <p class="text-gray-600 mb-4">Access and modify student results with easy filtering</p>
+                <a href="/view" class="card-link">
+                    View Results
+                    <span aria-hidden="true">→</span>
+                </a>
             </div>
-        </div>
 
-        <!-- Stats Section -->
-        <div class="mt-16 bg-white rounded-3xl shadow-xl p-8 max-w-4xl mx-auto border border-gray-100">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">📈 Quick Stats</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                <div class="bg-blue-50 rounded-2xl p-6">
-                    <div class="text-3xl font-bold text-blue-600">--</div>
-                    <div class="text-gray-600 mt-2">Total Students</div>
-                </div>
-                <div class="bg-green-50 rounded-2xl p-6">
-                    <div class="text-3xl font-bold text-green-600">--</div>
-                    <div class="text-gray-600 mt-2">Classes</div>
-                </div>
-                <div class="bg-purple-50 rounded-2xl p-6">
-                    <div class="text-3xl font-bold text-purple-600">--</div>
-                    <div class="text-gray-600 mt-2">Subjects</div>
-                </div>
-                <div class="bg-yellow-50 rounded-2xl p-6">
-                    <div class="text-3xl font-bold text-yellow-600">--</div>
-                    <div class="text-gray-600 mt-2">Results</div>
-                </div>
+            <!-- Subject Management Card -->
+            <div class="feature-card">
+                <div class="text-4xl mb-4">📋</div>
+                <h3 class="text-xl font-bold mb-2">Manage Subjects</h3>
+                <p class="text-gray-600 mb-4">Configure subjects and maximum marks for each class</p>
+                <a href="/manage_subjects" class="card-link">
+                    Manage Subjects
+                    <span aria-hidden="true">→</span>
+                </a>
             </div>
-        </div>
 
-        <!-- Features List -->
-        <div class="mt-16 max-w-4xl mx-auto">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">✨ Features</h2>
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                    <h4 class="font-semibold text-gray-800 mb-2">🎯 Smart Subject Loading</h4>
-                    <p class="text-gray-600">Subjects automatically load based on selected class</p>
-                </div>
-                <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                    <h4 class="font-semibold text-gray-800 mb-2">🔄 Duplicate Handling</h4>
-                    <p class="text-gray-600">Smart handling of duplicate roll numbers</p>
-                </div>
-                <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                    <h4 class="font-semibold text-gray-800 mb-2">✅ Input Validation</h4>
-                    <p class="text-gray-600">Comprehensive validation for all inputs</p>
-                </div>
-                <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                    <h4 class="font-semibold text-gray-800 mb-2">🎨 Modern Interface</h4>
-                    <p class="text-gray-600">Clean, user-friendly design</p>
-                </div>
+            <!-- Analytics Card -->
+            <div class="feature-card">
+                <div class="text-4xl mb-4">📊</div>
+                <h3 class="text-xl font-bold mb-2">Analytics</h3>
+                <p class="text-gray-600 mb-4">View detailed performance analytics and statistics</p>
+                <a href="/analytics" class="card-link">
+                    View Analytics
+                    <span aria-hidden="true">→</span>
+                </a>
             </div>
-        </div>
 
-        <!-- Footer -->
-        <div class="text-center mt-16 text-gray-500">
-            <p>&copy; 2024 School Result System. Built with ❤️ for education.</p>
-        </div>
-    </div>
+            <!-- Reports Card -->
+            <div class="feature-card">
+                <div class="text-4xl mb-4">📄</div>
+                <h3 class="text-xl font-bold mb-2">Generate Reports</h3>
+                <p class="text-gray-600 mb-4">Create and download detailed PDF reports</p>
+                <a href="/view" class="card-link">
+                    Generate Reports
+                    <span aria-hidden="true">→</span>
+                </a>
+            </div>
+        </section>
+
+        <style>
+            .feature-card {
+                background-color: white;
+                border-radius: 1rem;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                padding: 1.5rem;
+                border: 1px solid #f3f4f6;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                transition-property: all;
+                transition-duration: 300ms;
+            }
+            .feature-card:hover {
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            }
+            .card-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                color: #2563eb;
+                font-weight: 500;
+                transition-property: color;
+                transition-duration: 200ms;
+            }
+            .card-link:hover {
+                color: #1e40af;
+            }
+        </style>
+
+        <!-- Quick Links Section -->
+        <section class="bg-white rounded-3xl shadow-xl p-6 mb-10 mx-2">
+            <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6">Quick Actions</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <a href="/enter" class="p-3 text-center rounded-xl bg-blue-50 hover:bg-blue-100 transition-all flex flex-col items-center">
+                    <span class="block text-xl mb-1">📝</span>
+                    <span class="text-sm">Single Entry</span>
+                </a>
+                <a href="/bulk_entry" class="p-3 text-center rounded-xl bg-purple-50 hover:bg-purple-100 transition-all flex flex-col items-center">
+                    <span class="block text-xl mb-1">📚</span>
+                    <span class="text-sm">Bulk Entry</span>
+                </a>
+                <a href="/view" class="p-3 text-center rounded-xl bg-green-50 hover:bg-green-100 transition-all flex flex-col items-center">
+                    <span class="block text-xl mb-1">👀</span>
+                    <span class="text-sm">View Results</span>
+                </a>
+                <a href="/view" class="p-3 text-center rounded-xl bg-yellow-50 hover:bg-yellow-100 transition-all flex flex-col items-center">
+                    <span class="block text-xl mb-1">✏️</span>
+                    <span class="text-sm">Edit Results</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Stats Section with Animation -->
+        <section class="bg-white rounded-3xl shadow-xl p-6 mx-2 mb-10">
+            <!-- ...existing stats section... -->
+        </section>
+    </main>
+
+    {% include '_footer.html' %}
 </body>
 </html>

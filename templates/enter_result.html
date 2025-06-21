@@ -162,53 +162,63 @@
   </div>
 
   <script>
-    // Class to subjects mapping
-    const classToSubjects = JSON.parse('{{ class_subjects|tojson|safe }}');
-    
     document.addEventListener('DOMContentLoaded', () => {
-      const classSelect = document.getElementById('class-select');
-      const subjectContainer = document.getElementById('subject-fields');
-      
-      function loadSubjects(selectedClass) {
-        subjectContainer.innerHTML = '';
+        const classSelect = document.getElementById('class-select');
+        const subjectContainer = document.getElementById('subject-fields');
         
-        if (classToSubjects[selectedClass]) {
-          const subjects = classToSubjects[selectedClass];
-          
-          subjects.forEach(subject => {
-            const fieldName = `marks_${subject.toLowerCase().replace(' ', '_')}`;
-            const fieldHTML = `
-              <div class="bg-white p-4 rounded-xl border-2 border-gray-200 hover:border-blue-300 transition-all duration-200">
-                <label class="block font-medium text-gray-700 mb-2">${subject}</label>
-                <input 
-                  type="number" 
-                  name="${fieldName}" 
-                  class="border-2 border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 w-full px-3 py-2 rounded-lg transition-all duration-200" 
-                  min="0" 
-                  max="100" 
-                  placeholder="0-100"
-                  step="0.5">
-              </div>`;
-            subjectContainer.innerHTML += fieldHTML;
-          });
-        } else {
-          subjectContainer.innerHTML = `
-            <div class="text-center text-gray-500 col-span-full py-8">
-              <span class="text-4xl">📝</span>
-              <p class="mt-2">Please select a valid class</p>
-            </div>`;
+        async function loadSubjects(selectedClass) {
+            subjectContainer.innerHTML = '<div class="col-span-full text-center py-8">Loading subjects...</div>';
+            
+            try {
+                const response = await fetch(`/api/subjects/${selectedClass}`);
+                const subjects = await response.json();
+                
+                if (subjects.length === 0) {
+                    subjectContainer.innerHTML = `
+                        <div class="col-span-full text-center py-8 text-gray-500">
+                            <p>No subjects configured for Class ${selectedClass}</p>
+                            <a href="/manage_subjects" class="text-blue-500 hover:underline">
+                                Configure subjects
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                subjectContainer.innerHTML = subjects.map(subject => `
+                    <div class="bg-white p-4 rounded-xl border-2 border-gray-200 hover:border-blue-300 transition-all">
+                        <label class="block font-medium text-gray-700 mb-2">${subject.name}</label>
+                        <input type="number" 
+                               name="marks_${subject.name.toLowerCase().replace(/\s+/g, '_')}" 
+                               class="w-full px-4 py-2 rounded-lg border-2 border-gray-200 
+                                      focus:border-blue-500 focus:ring focus:ring-blue-200" 
+                               min="0" 
+                               max="${subject.max_marks}"
+                               step="0.5"
+                               placeholder="Max marks: ${subject.max_marks}">
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading subjects:', error);
+                subjectContainer.innerHTML = `
+                    <div class="col-span-full text-center py-8 text-red-500">
+                        Error loading subjects. Please try again.
+                    </div>
+                `;
+            }
         }
-      }
-      
-      // Load subjects when class changes
-      classSelect.addEventListener('change', (e) => {
-        loadSubjects(e.target.value);
-      });
-      
-      // Load subjects if class is pre-selected (for form prefill)
-      if (classSelect.value) {
-        loadSubjects(classSelect.value);
-      }
+        
+        classSelect.addEventListener('change', (e) => {
+            if (e.target.value) {
+                loadSubjects(e.target.value);
+            }
+        });
+        
+        // Load subjects if class is pre-selected
+        if (classSelect.value) {
+            loadSubjects(classSelect.value);
+        }
     });
   </script>
 </body>

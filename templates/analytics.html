@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Result Analytics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-green-50 min-h-screen flex flex-col">
+    {% include '_header.html' %}
+    <main class="flex-1 w-full max-w-4xl mx-auto p-4">
+        <h1 class="text-3xl font-bold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-green-600">
+            📊 Result Analytics
+        </h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <!-- Class Average Chart -->
+            <div class="bg-white rounded-xl shadow-lg p-4">
+                <h2 class="text-xl font-semibold mb-2">Class-wise Average Marks</h2>
+                <canvas id="classAvgChart" height="200"></canvas>
+            </div>
+            <!-- Pass/Fail Pie Chart -->
+            <div class="bg-white rounded-xl shadow-lg p-4">
+                <h2 class="text-xl font-semibold mb-2">Pass/Fail Distribution</h2>
+                <canvas id="passFailChart" height="200"></canvas>
+            </div>
+        </div>
+        <!-- Subject Toppers -->
+        <div class="bg-white rounded-xl shadow-lg p-4 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Subject Toppers</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead>
+                        <tr class="bg-blue-100">
+                            <th class="px-4 py-2 text-left">Subject</th>
+                            <th class="px-4 py-2 text-left">Topper</th>
+                            <th class="px-4 py-2 text-left">Marks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if subject_toppers is defined and subject_toppers and subject_toppers|length > 0 %}
+                        {% for topper in subject_toppers %}
+                        <tr>
+                            <td class="px-4 py-2">{{ topper.subject }}</td>
+                            <td class="px-4 py-2">{{ topper.student }}</td>
+                            <td class="px-4 py-2">{{ topper.marks }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="px-4 py-2 text-center text-gray-400">No data available</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="text-center">
+            <a href="{{ url_for('view_results') }}" class="text-blue-600 hover:text-blue-800 font-medium">← Back to Results</a>
+        </div>
+    </main>
+    <script type="text/javascript">
+        // Use safe Jinja serialization and always define variables
+        const classAvgData = JSON.parse('{{ class_avg_data|tojson|safe if class_avg_data is defined else "[]" }}');
+        const passCount = Number('{{ pass_count|default(0) }}');
+        const failCount = Number('{{ fail_count|default(0) }}');
+
+        // Defensive: Only render charts if canvas exists and data is array
+        document.addEventListener('DOMContentLoaded', function() {
+            var classAvgChartElem = document.getElementById('classAvgChart');
+            if (classAvgChartElem && Array.isArray(classAvgData)) {
+                var ctx1 = classAvgChartElem.getContext('2d');
+                new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: classAvgData.map(function(d) { return d.cls; }),
+                        datasets: [{
+                            label: 'Average Marks',
+                            data: classAvgData.map(function(d) { return d.avg; }),
+                            backgroundColor: 'rgba(59, 130, 246, 0.7)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, max: 100 } }
+                    }
+                });
+            }
+
+            var passFailChartElem = document.getElementById('passFailChart');
+            if (passFailChartElem) {
+                var ctx2 = passFailChartElem.getContext('2d');
+                new Chart(ctx2, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Pass', 'Fail'],
+                        datasets: [{
+                            data: [passCount, failCount],
+                            backgroundColor: ['#10b981', '#ef4444']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

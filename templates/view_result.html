@@ -13,6 +13,14 @@
                 📊 Student Results
             </h1>
             <p class="text-gray-600">View and search student results</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-2 mt-4">
+                <a href="{{ url_for('analytics') }}" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-all text-sm font-medium">
+                    📈 Analytics
+                </a>
+                <a href="{{ url_for('export_excel') }}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-all text-sm font-medium">
+                    ⬇️ Export to Excel
+                </a>
+            </div>
         </div>
 
         <!-- Search and Filter Section -->
@@ -121,7 +129,7 @@
                                         <div class="flex items-center space-x-2">
                                             <span class="font-medium">{{ subject.marks }}/{{ subject.max_marks }}</span>
                                             <span class="px-2 py-1 rounded text-xs font-medium {{ subject.grade_color }}">
-                                                {{ subject.grade }}
+                                                {{ subject.grade }} ({{ subject.percentage }}%)
                                             </span>
                                         </div>
                                     </div>
@@ -151,21 +159,58 @@
                             <!-- Actions -->
                             <td class="px-6 py-4 text-center">
                                 <div class="flex justify-center space-x-2">
-                                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                        📄 View Details
-                                    </button>
-                                    <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                        📋 PDF
-                                    </button>
-                                    <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                        ✏️ Edit
-                                    </button>
+                                    <a href="{{ url_for('student_detail', student_id=student.id) }}" 
+                                       class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                                        <span>👁️</span> View
+                                    </a>
+                                    <a href="{{ url_for('edit_result', student_id=student.id) }}"
+                                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                                        <span>✏️</span> Edit
+                                    </a>
+                                    <a href="{{ url_for('download_pdf', student_id=student.id) }}"
+                                       class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                                        <span>📄</span> PDF
+                                    </a>
+                                    <a href="{{ url_for('download_class_pdf', cls=student.cls, section=student.section) }}"
+                                       class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                                        <span>📊</span> Class PDF
+                                    </a>
                                 </div>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="bg-gray-50 px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    <button onclick="changePage('prev')" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Previous
+                    </button>
+                    <button onclick="changePage('next')" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Next
+                    </button>
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Showing <span id="page-start">1</span> to <span id="page-end">10</span> of <span id="total-items">{{ students|length }}</span> results
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            <button onclick="changePage('prev')" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                Previous
+                            </button>
+                            <div id="page-numbers" class="flex"></div>
+                            <button onclick="changePage('next')" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                Next
+                            </button>
+                        </nav>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -181,78 +226,138 @@
             <a href="/" class="text-blue-600 hover:text-blue-800 font-medium mr-4">← Back to Home</a>
             <a href="/enter" class="text-green-600 hover:text-green-800 font-medium">Add New Result →</a>
         </div>
+
+        <!-- Clear History Button -->
+        <div class="mt-8 text-center">
+            <form method="POST" action="{{ url_for('clear_history') }}" 
+                  onsubmit="return confirm('Are you sure you want to clear all result history? This cannot be undone.');">
+                <button type="submit" 
+                        class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium transform hover:scale-105 transition-all duration-200">
+                    🗑️ Clear All Result History
+                </button>
+            </form>
+        </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('search-input');
-            const classFilter = document.getElementById('class-filter');
-            const sectionFilter = document.getElementById('section-filter');
-            const statusFilter = document.getElementById('status-filter');
-            const clearFiltersBtn = document.getElementById('clear-filters');
-            const resultCount = document.getElementById('result-count');
-            const studentRows = document.querySelectorAll('.student-row');
-            const emptyState = document.getElementById('empty-state');
-            const resultsTable = document.querySelector('.bg-white.rounded-2xl.shadow-lg.overflow-hidden');
+        const itemsPerPage = 10;
+        let currentPage = 1;
+        let filteredStudents = [];
+        let allStudents = [];
 
-            function filterResults() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const classValue = classFilter.value;
-                const sectionValue = sectionFilter.value;
-                const statusValue = statusFilter.value;
-
-                let visibleCount = 0;
-
-                studentRows.forEach(row => {
-                    const name = row.dataset.name;
-                    const roll = row.dataset.roll;
-                    const studentClass = row.dataset.class;
-                    const section = row.dataset.section;
-                    const status = row.dataset.status;
-
-                    const matchesSearch = !searchTerm || name.includes(searchTerm) || roll.includes(searchTerm);
-                    const matchesClass = !classValue || studentClass === classValue;
-                    const matchesSection = !sectionValue || section === sectionValue;
-                    const matchesStatus = !statusValue || status === statusValue;
-
-                    if (matchesSearch && matchesClass && matchesSection && matchesStatus) {
-                        row.style.display = '';
-                        visibleCount++;
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-
-                resultCount.textContent = visibleCount;
-
-                // Show/hide empty state
-                if (visibleCount === 0) {
-                    emptyState.classList.remove('hidden');
-                    resultsTable.classList.add('hidden');
-                } else {
-                    emptyState.classList.add('hidden');
-                    resultsTable.classList.remove('hidden');
-                }
-            }
-
-            function clearFilters() {
-                searchInput.value = '';
-                classFilter.value = '';
-                sectionFilter.value = '';
-                statusFilter.value = '';
-                filterResults();
-            }
-
-            // Event listeners
-            searchInput.addEventListener('input', filterResults);
-            classFilter.addEventListener('change', filterResults);
-            sectionFilter.addEventListener('change', filterResults);
-            statusFilter.addEventListener('change', filterResults);
-            clearFiltersBtn.addEventListener('click', clearFilters);
-
-            // Initial filter
+        document.addEventListener('DOMContentLoaded', () => {
+            allStudents = Array.from(document.querySelectorAll('.student-row'));
             filterResults();
         });
+
+        function filterResults() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const classValue = document.getElementById('class-filter').value;
+            const sectionValue = document.getElementById('section-filter').value;
+            const statusValue = document.getElementById('status-filter').value;
+
+            filteredStudents = allStudents.filter(row => {
+                const name = row.dataset.name;
+                const roll = row.dataset.roll;
+                const studentClass = row.dataset.class;
+                const section = row.dataset.section;
+                const status = row.dataset.status;
+
+                const matchesSearch = !searchTerm || 
+                                    name.includes(searchTerm) || 
+                                    roll.includes(searchTerm);
+                const matchesClass = !classValue || studentClass === classValue;
+                const matchesSection = !sectionValue || section === sectionValue;
+                const matchesStatus = !statusValue || status === statusValue;
+
+                return matchesSearch && matchesClass && matchesSection && matchesStatus;
+            });
+
+            currentPage = 1;
+            updatePagination();
+            updateResultCount();
+            toggleEmptyState();
+        }
+
+        function updateResultCount() {
+            document.getElementById('result-count').textContent = filteredStudents.length;
+        }
+
+        function toggleEmptyState() {
+            const emptyState = document.getElementById('empty-state');
+            const resultsTable = document.querySelector('.results-table');
+            
+            if (filteredStudents.length === 0) {
+                emptyState.classList.remove('hidden');
+                resultsTable.classList.add('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                resultsTable.classList.remove('hidden');
+            }
+        }
+
+        // Pagination functions
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = Math.min(start + itemsPerPage, filteredStudents.length);
+
+            document.getElementById('page-start').textContent = start + 1;
+            document.getElementById('page-end').textContent = end;
+            document.getElementById('total-items').textContent = filteredStudents.length;
+
+            // Update page numbers
+            const pageNumbers = document.getElementById('page-numbers');
+            pageNumbers.innerHTML = '';
+            
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement('button');
+                button.className = `relative inline-flex items-center px-4 py-2 border ${
+                    i === currentPage ? 'bg-blue-50 border-blue-500 text-blue-600' : 'border-gray-300 text-gray-500'
+                } text-sm font-medium`;
+                button.textContent = i;
+                button.onclick = () => goToPage(i);
+                pageNumbers.appendChild(button);
+            }
+
+            // Show visible items
+            const rows = document.querySelectorAll('.student-row');
+            rows.forEach((row, index) => {
+                row.style.display = filteredStudents.includes(row) && 
+                                  index >= start && index < end ? '' : 'none';
+            });
+        }
+
+        function changePage(direction) {
+            const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
+            if (direction === 'prev' && currentPage > 1) {
+                currentPage--;
+            } else if (direction === 'next' && currentPage < totalPages) {
+                currentPage++;
+            }
+            updatePagination();
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            updatePagination();
+        }
+
+        // Event listeners
+        document.getElementById('search-input').addEventListener('input', filterResults);
+        document.getElementById('class-filter').addEventListener('change', filterResults);
+        document.getElementById('section-filter').addEventListener('change', filterResults);
+        document.getElementById('status-filter').addEventListener('change', filterResults);
+        document.getElementById('clear-filters').addEventListener('click', () => {
+            document.getElementById('search-input').value = '';
+            document.getElementById('class-filter').value = '';
+            document.getElementById('section-filter').value = '';
+            document.getElementById('status-filter').value = '';
+            filterResults();
+        });
+
+        // Initial filter
+        filterResults();
     </script>
 </body>
 </html>

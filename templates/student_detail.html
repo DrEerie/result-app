@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Result Detail</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-green-50 min-h-screen">
+    <div class="container mx-auto p-6">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600 mb-2">
+                📊 Student Result Detail
+            </h1>
+            <p class="text-gray-600">Detailed view of student performance</p>
+        </div>
+
+        <!-- Student Info Card -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex items-center mb-6">
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-400 to-green-400 rounded-full flex items-center justify-center text-white text-2xl font-bold mr-4">
+                    {{ student.name[0].upper() }}
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">{{ student.name }}</h2>
+                    <p class="text-gray-600">Roll No: {{ student.roll_no }}</p>
+                    <p class="text-gray-600">Class: {{ student.cls }}-{{ student.section }}</p>
+                </div>
+                <div class="ml-auto">
+                    <a href="{{ url_for('download_pdf', student_id=student.id) }}" 
+                       class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg inline-flex items-center">
+                        <span class="mr-2">📄</span> Download PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Subject-wise Results -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-semibold mb-4">Subject Results</h3>
+                <div class="space-y-4">
+                    {% for subject in overall_result.subject_results %}
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-medium text-gray-800">{{ subject.subject_name }}</h4>
+                            <span class="px-3 py-1 rounded-full text-sm font-medium {{ subject.grade_color|default('text-gray-600') }}">
+                                {{ subject.grade }}
+                            </span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full"
+                                 style="width: '{{ subject.percentage|default(0)|int }}%'"></div>
+                        </div>
+                        <div class="flex justify-between mt-2 text-sm text-gray-600">
+                            <span>Marks: {{ subject.marks }}/{{ subject.max_marks }}</span>
+                            <span>{{ subject.percentage }}%</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Overall Performance -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-semibold mb-4">Overall Performance</h3>
+                <div class="text-center p-6 bg-gray-50 rounded-xl">
+                    <div class="text-5xl font-bold mb-4 text-{{ overall_result.grade_color|default('gray-600') }}">
+                        {{ overall_result.overall_grade }}
+                    </div>
+                    <div class="text-3xl font-bold text-gray-800 mb-2">
+                        {{ overall_result.overall_percentage }}%
+                    </div>
+                    <div class="text-gray-600">
+                        Total: {{ overall_result.total_marks }}/{{ overall_result.total_max_marks }}
+                    </div>
+                    <div class="mt-4">
+                        <span class="px-4 py-2 rounded-full text-sm font-medium {{ overall_result.status_color }}">
+                            {{ 'PASS' if overall_result.is_pass else 'FAIL' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="mt-8 text-center">
+            <a href="{{ url_for('view_results') }}" class="text-blue-600 hover:text-blue-800 font-medium">
+                ← Back to Results
+            </a>
+        </div>
+    </div>
+</body>
+</html>
