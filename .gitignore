@@ -1,32 +1,37 @@
-# Ignore Python compiled files
-*.pyc
-__pycache__/
+# Python cache files
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
 
-# Ignore database files
+# Database files
 database/*.db
 
-#Ignore virtual environment files
+# Virtual environment
 venv/
 
-
-# Ignore temporary files
+# Temporary files
 *.tmp
 *.log
 
-# Ignore node_modules (npm may be used later ..)
+# Node modules
 node_modules/
 
-# Ignore build artifacts
+# Build artifacts
 dist/
 build/
 
-# Ignore IDE-specific files
+# IDE files
 .vscode/
 .idea/
 
+# PDF files but keep directories
+static/pdfs/**/*.pdf
+static/pdf/**/*.pdf
 
-# Ignore pdf files in /static/pdf
-static/pdf/
+# Keep pdf directories but ignore contents
+!static/pdfs/.gitkeep
+!static/pdf/.gitkeep
 
-# Ignore another app undeanerth in it: named result2app
+# Other project
 result2app/
