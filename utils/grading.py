@@ -22,7 +22,7 @@ def calculate_grade(percentage):
         return 'F'
 
 def calculate_percentage(marks, max_marks=100):
-    """Calculate percentage from marks"""
+    """Calculate percentage from marks using provided max_marks"""
     if max_marks == 0:
         return 0
     return round((marks / max_marks) * 100, 2)
@@ -32,21 +32,7 @@ def is_passing_grade(grade):
     return grade != 'F'
 
 def calculate_student_overall_result(results):
-    """
-    Calculate overall result for a student
-    Args:
-        results: List of Result objects for a student
-    
-    Returns:
-        dict: {
-            'total_marks': float,
-            'total_max_marks': float,
-            'overall_percentage': float,
-            'overall_grade': str,
-            'is_pass': bool,
-            'subject_results': list of dict with subject details
-        }
-    """
+    """Calculate overall result using dynamic max marks"""
     if not results:
         return {
             'total_marks': 0,
@@ -63,17 +49,19 @@ def calculate_student_overall_result(results):
     has_failed_subject = False
     
     for result in results:
+        subject = result.subject
         marks = result.marks
-        max_marks = result.max_marks
+        max_marks = subject.max_marks
+        
+        # Calculate percentage based on subject's max marks
         percentage = calculate_percentage(marks, max_marks)
         grade = calculate_grade(percentage)
         
-        # Check if student failed in this subject
         if not is_passing_grade(grade):
             has_failed_subject = True
         
         subject_results.append({
-            'subject_name': result.subject.name,
+            'subject_name': subject.name,
             'marks': marks,
             'max_marks': max_marks,
             'percentage': percentage,
@@ -84,11 +72,9 @@ def calculate_student_overall_result(results):
         total_marks += marks
         total_max_marks += max_marks
     
-    # Calculate overall percentage and grade
+    # Calculate overall percentage based on total marks and total max marks
     overall_percentage = calculate_percentage(total_marks, total_max_marks)
     overall_grade = calculate_grade(overall_percentage)
-    
-    # Student fails overall if failed in any subject OR overall percentage is below 40%
     is_pass = not has_failed_subject and is_passing_grade(overall_grade)
     
     return {

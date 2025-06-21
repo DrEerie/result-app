@@ -1,7 +1,16 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-from models.models import db, Student, Subject, Result
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify
+from models.models import db, Student, Subject, Result, init_db
 from utils.grading import calculate_student_overall_result, get_grade_color, get_result_status_color
+from utils.pdf_generator import generate_result_pdf, generate_class_pdf
+from datetime import datetime
 import os
+import io
+
+# Add import for Excel export
+try:
+    import openpyxl
+except ImportError:
+    openpyxl = None
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_change_this_in_production'
@@ -32,29 +41,6 @@ CLASS_SUBJECTS = {
     '11': ['Physics', 'Chemistry', 'Math', 'Biology'],
     '12': ['Physics', 'Chemistry', 'Math', 'Biology']
 }
-
-def init_database():
-    """Initialize database with tables and default subjects"""
-    with app.app_context():
-        # Create all tables
-        db.create_all()
-        
-        # Add all subjects if they don't exist
-        all_subjects = set()
-        for subjects in CLASS_SUBJECTS.values():
-            all_subjects.update(subjects)
-        
-        for subject_name in all_subjects:
-            if not Subject.query.filter_by(name=subject_name).first():
-                subject = Subject(name=subject_name)
-                db.session.add(subject)
-        
-        try:
-            db.session.commit()
-            print("Database initialized successfully!")
-        except Exception as e:
-            print(f"Error initializing database: {e}")
-            db.session.rollback()
 
 @app.route('/')
 def home():
@@ -155,36 +141,29 @@ def add_results(student, cls, form_data):
     """Add marks for the student based on their class"""
     marks_added = 0
     
-    if cls in CLASS_SUBJECTS:
-        for subject_name in CLASS_SUBJECTS[cls]:
-            marks_key = f"marks_{subject_name.lower().replace(' ', '_')}"
-            marks = form_data.get(marks_key, '').strip()
-            
-            if marks:
-                try:
-                    marks_value = float(marks)
-                    if 0 <= marks_value <= 100:
-                        # Get or create subject
-                        subject = Subject.query.filter_by(name=subject_name).first()
-                        if not subject:
-                            subject = Subject(name=subject_name)
-                            db.session.add(subject)
-                            db.session.flush()  # Get the ID
-                        
-                        # Add result
-                        result = Result(
-                            student_id=student.id,
-                            subject_id=subject.id,
-                            marks=marks_value,
-                            term='Annual',  # Default term
-                            session='2024-25'  # Default session
-                        )
-                        db.session.add(result)
-                        marks_added += 1
-                    else:
-                        flash(f"⚠️ Marks for {subject_name} should be between 0-100", "warning")
-                except ValueError:
-                    flash(f"⚠️ Invalid marks for {subject_name}", "warning")
+    # Get subjects for this class
+    subjects = Subject.query.filter_by(class_name=cls).all()
+    
+    for subject in subjects:
+        marks_key = f"marks_{subject.name.lower().replace(' ', '_')}"
+        marks = form_data.get(marks_key, '').strip()
+        
+        if marks:
+            try:
+                marks_value = float(marks)
+                if 0 <= marks_value <= subject.max_marks:
+                    result = Result(
+                        student_id=student.id,
+                        subject_id=subject.id,
+                        marks=marks_value,
+                        term='Annual'
+                    )
+                    db.session.add(result)
+                    marks_added += 1
+                else:
+                    flash(f"⚠️ Marks for {subject.name} should be between 0-{subject.max_marks}", "warning")
+            except ValueError:
+                flash(f"⚠️ Invalid marks for {subject.name}", "warning")
     
     if marks_added > 0:
         db.session.commit()
@@ -248,6 +227,360 @@ def student_detail(student_id):
                          student=student, 
                          overall_result=overall_result)
 
+@app.route('/download_pdf/<int:student_id>')
+def download_pdf(student_id):
+    """Generate and download PDF result for a student"""
+    student = Student.query.get_or_404(student_id)
+    results = Result.query.filter_by(student_id=student.id).all()
+    overall_result = calculate_student_overall_result(results)
+    
+    student_data = {
+        'name': student.name,
+        'roll_no': student.roll_no,
+        'cls': student.cls,
+        'section': student.section,
+        'overall_result': overall_result
+    }
+    
+    # Create PDFs directory if it doesn't exist
+    pdf_dir = os.path.join(app.static_folder, 'pdfs')
+    os.makedirs(pdf_dir, exist_ok=True)
+    
+    # Generate PDF filename
+    filename = f"result_{student.roll_no}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    pdf_path = os.path.join(pdf_dir, filename)
+    
+    # Generate PDF
+    generate_result_pdf(student_data, pdf_path)
+    
+    # Send file
+    return send_file(pdf_path, as_attachment=True)
+
+@app.route('/bulk_entry', methods=['GET', 'POST'])
+def bulk_entry():
+    """Handle bulk result entry for a class"""
+    if request.method == 'POST':
+        cls = request.form.get('cls')
+        section = request.form.get('section')
+        
+        # Get student data from form
+        roll_numbers = request.form.getlist('roll_no[]')
+        names = request.form.getlist('name[]')
+        
+        success_count = 0
+        for i in range(len(roll_numbers)):
+            try:
+                # Create or update student
+                student = Student.query.filter_by(roll_no=roll_numbers[i]).first()
+                if not student:
+                    student = Student(
+                        roll_no=roll_numbers[i],
+                        name=names[i],
+                        cls=cls,
+                        section=section
+                    )
+                    db.session.add(student)
+                    db.session.flush()
+                
+                # Add results for each subject
+                for subject_name in CLASS_SUBJECTS.get(cls, []):
+                    marks_key = f"marks_{i}_{subject_name.lower().replace(' ', '_')}"
+                    marks = request.form.get(marks_key)
+                    if marks and marks.strip():
+                        subject = Subject.query.filter_by(name=subject_name).first()
+                        result = Result(
+                            student_id=student.id,
+                            subject_id=subject.id,
+                            marks=float(marks),
+                            term='Annual'
+                        )
+                        db.session.add(result)
+                success_count += 1
+            except Exception as e:
+                flash(f"Error adding student {names[i]}: {str(e)}", "error")
+                continue
+        
+        db.session.commit()
+        flash(f"Successfully added results for {success_count} students!", "success")
+        return redirect(url_for('view_results'))
+            
+    return render_template('bulk_entry.html', class_subjects=CLASS_SUBJECTS)
+
+@app.route('/class_pdf/<cls>/<section>')
+def download_class_pdf(cls, section):
+    """Generate and download PDF result for entire class"""
+    students = Student.query.filter_by(cls=cls, section=section).all()
+    if not students:
+        flash("No students found in this class!", "error")
+        return redirect(url_for('view_results'))
+    
+    class_data = {
+        'cls': cls,
+        'section': section,
+        'students': []
+    }
+    
+    for student in students:
+        results = Result.query.filter_by(student_id=student.id).all()
+        overall_result = calculate_student_overall_result(results)
+        class_data['students'].append({
+            'name': student.name,
+            'roll_no': student.roll_no,
+            'overall_result': overall_result
+        })
+    
+    # Generate PDF filename
+    filename = f"class_{cls}_{section}_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    pdf_dir = os.path.join(app.static_folder, 'pdfs')
+    os.makedirs(pdf_dir, exist_ok=True)
+    pdf_path = os.path.join(pdf_dir, filename)
+    
+    # Generate class PDF
+    generate_class_pdf(class_data, pdf_path)
+    
+    return send_file(pdf_path, as_attachment=True)
+
+@app.route('/clear_history', methods=['POST'])
+def clear_history():
+    """Clear all results from database"""
+    try:
+        Result.query.delete()
+        Student.query.delete()
+        db.session.commit()
+        flash("Successfully cleared all result history!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error clearing history: {str(e)}", "error")
+    return redirect(url_for('view_results'))
+
+@app.route('/edit/<int:student_id>', methods=['GET', 'POST'])
+def edit_result(student_id):
+    student = Student.query.get_or_404(student_id)
+    results = Result.query.filter_by(student_id=student_id).all()
+    
+    # Get subjects specific to student's class
+    class_subjects = Subject.query.filter_by(class_name=student.cls).all()
+    
+    if request.method == 'POST':
+        try:
+            for subject in class_subjects:
+                marks_key = f'marks_{subject.id}'
+                marks_str = request.form.get(marks_key, '').strip()
+                
+                if marks_str:  # Only process if marks were entered
+                    marks = float(marks_str)
+                    if 0 <= marks <= subject.max_marks:  # Use subject's max_marks
+                        result = Result.query.filter_by(
+                            student_id=student_id,
+                            subject_id=subject.id
+                        ).first() or Result(
+                            student_id=student_id,
+                            subject_id=subject.id
+                        )
+                        
+                        result.marks = marks
+                        if result.id is None:
+                            db.session.add(result)
+                    else:
+                        flash(f"Marks for {subject.name} must be between 0 and {subject.max_marks}", "error")
+                        return redirect(url_for('edit_result', student_id=student_id))
+            
+            db.session.commit()
+            flash("Results updated successfully!", "success")
+            return redirect(url_for('view_results'))
+            
+        except ValueError:
+            flash("Invalid marks entered", "error")
+            return redirect(url_for('edit_result', student_id=student_id))
+    
+    return render_template('edit_result.html', 
+                         student=student, 
+                         results=results,
+                         all_subjects=class_subjects)  # Pass only class-specific subjects
+
+@app.route('/analytics')
+def analytics():
+    """Show result analytics with charts"""
+    # Gather data for analytics
+    students = Student.query.all()
+    subjects = Subject.query.all()
+    results = Result.query.all()
+
+    # Class-wise average marks
+    class_averages = {}
+    for student in students:
+        student_results = Result.query.filter_by(student_id=student.id).all()
+        total = sum(r.marks for r in student_results)
+        count = len(student_results)
+        if count:
+            class_averages.setdefault(student.cls, []).append(total / count)
+    class_avg_data = [
+        {"cls": cls, "avg": round(sum(vals)/len(vals), 2) if vals else 0}
+        for cls, vals in class_averages.items()
+    ]
+
+    # Subject toppers
+    subject_toppers = []
+    for subject in subjects:
+        top_result = (
+            db.session.query(Result, Student)
+            .join(Student, Result.student_id == Student.id)
+            .filter(Result.subject_id == subject.id)
+            .order_by(Result.marks.desc())
+            .first()
+        )
+        if top_result:
+            result, student = top_result
+            subject_toppers.append({
+                "subject": subject.name,
+                "student": student.name,
+                "marks": result.marks
+            })
+
+    # Pass/fail distribution
+    pass_count = 0
+    fail_count = 0
+    for student in students:
+        student_results = Result.query.filter_by(student_id=student.id).all()
+        overall = calculate_student_overall_result(student_results)
+        if overall['is_pass']:
+            pass_count += 1
+        else:
+            fail_count += 1
+
+    return render_template(
+        'analytics.html',
+        class_avg_data=class_avg_data,
+        subject_toppers=subject_toppers,
+        pass_count=pass_count,
+        fail_count=fail_count
+    )
+
+@app.route('/export_excel')
+def export_excel():
+    """Export results with dynamic max marks"""
+    if openpyxl is None:
+        flash("openpyxl is not installed. Please install it to enable Excel export.", "error")
+        return redirect(url_for('view_results'))
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Results"
+
+    # Header
+    ws.append([
+        "Roll No", "Name", "Class", "Section", 
+        "Subject", "Marks Obtained", "Maximum Marks", 
+        "Percentage", "Grade", "Status"
+    ])
+
+    students = Student.query.all()
+    for student in students:
+        results = Result.query.filter_by(student_id=student.id).all()
+        overall = calculate_student_overall_result(results)
+        for subject_result in overall['subject_results']:
+            ws.append([
+                student.roll_no,
+                student.name,
+                student.cls,
+                student.section,
+                subject_result['subject_name'],
+                subject_result['marks'],
+                subject_result['max_marks'],
+                f"{subject_result['percentage']}%",
+                subject_result['grade'],
+                "PASS" if subject_result['is_pass'] else "FAIL"
+            ])
+
+    # Save to BytesIO and send as file
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name="all_results.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+@app.route('/manage_subjects', methods=['GET', 'POST'])
+def manage_subjects():
+    """Handle subject management page"""
+    if request.method == 'POST':
+        class_name = request.form.get('class_name')
+        subject_names = request.form.getlist('subject_names[]')
+        max_marks = request.form.getlist('max_marks[]')
+
+        try:
+            # Remove old subjects for this class
+            Subject.query.filter_by(class_name=class_name).delete()
+
+            # Add new subjects
+            for name, marks in zip(subject_names, max_marks):
+                if name.strip():  # Only add if name is not empty
+                    subject = Subject(
+                        name=name.strip(),
+                        max_marks=float(marks),
+                        class_name=class_name
+                    )
+                    db.session.add(subject)
+
+            db.session.commit()
+            flash('Subjects updated successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating subjects: {str(e)}', 'error')
+
+        return redirect(url_for('manage_subjects'))
+
+    # For GET request, get all available classes
+    classes = list(CLASS_SUBJECTS.keys())  # Use the predefined classes
+    return render_template('manage_subjects.html', classes=classes)
+
+# Ensure this route is also present
+@app.route('/api/subjects/<class_name>')
+def get_class_subjects(class_name):
+    """API endpoint to get subjects for a class"""
+    try:
+        subjects = Subject.query.filter_by(class_name=class_name).all()
+        return jsonify([{
+            'name': subject.name,
+            'max_marks': subject.max_marks
+        } for subject in subjects])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+def init_database():
+    """Initialize database with tables and default subjects"""
+    with app.app_context():
+        try:
+            # Create all tables
+            db.create_all()
+            
+            # Add default subjects for each class
+            for cls, subjects in CLASS_SUBJECTS.items():
+                for subject_name in subjects:
+                    existing = Subject.query.filter_by(
+                        name=subject_name,
+                        class_name=cls
+                    ).first()
+                    
+                    if not existing:
+                        subject = Subject(
+                            name=subject_name,
+                            max_marks=100.0,
+                            class_name=cls
+                        )
+                        db.session.add(subject)
+            
+            db.session.commit()
+            print("Database initialized successfully!")
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"Database initialization failed: {str(e)}")
+
 if __name__ == '__main__':
-    init_database()
+    with app.app_context():
+        init_database()
     app.run(debug=True)
