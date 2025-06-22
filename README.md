@@ -39,7 +39,7 @@ result-app/
 │   ├── enter_result.html   # Single result entry
 │   ├── bulk_entry.html     # Bulk result import
 │   ├── view_result.html    # Result viewing interface
-│   ├── manage_subjects.html # Subject management
+│   ├── customization.html    # Customization (was Subject Management)
 │   └── analytics.html      # Analytics dashboard
 ├── static/
 │   ├── css/               # Custom styling (using Tailwind CDN)

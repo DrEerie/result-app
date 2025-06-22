@@ -571,9 +571,9 @@ def export_excel():
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
-@app.route('/manage_subjects', methods=['GET', 'POST'])
-def manage_subjects():
-    """Handle subject management page"""
+@app.route('/customization', methods=['GET', 'POST'])
+def customization():
+    """Handle customization page (was subject management)"""
     if request.method == 'POST':
         class_name = request.form.get('class_name')
         subject_names = request.form.getlist('subject_names[]')
@@ -607,13 +607,13 @@ def manage_subjects():
             db.session.rollback()
             flash(f'Error updating settings: {str(e)}', 'error')
 
-        return redirect(url_for('manage_subjects'))
+        return redirect(url_for('customization'))
 
     # For GET request, get all classes and their settings
     classes = list(CLASS_SUBJECTS.keys())
     class_settings = {s.class_name: s.max_days for s in ClassSettings.query.all()}
     
-    return render_template('manage_subjects.html', 
+    return render_template('customization.html', 
                          classes=classes,
                          class_settings=class_settings)
 
@@ -678,6 +678,20 @@ def init_database():
             db.session.rollback()
             print(f"Database initialization failed: {str(e)}")
 
+# API endpoint definitions above...
+
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+@app.route('/terms')
+def terms():
+    return render_template('terms.html')
+
+@app.route('/cookies')
+def cookies():
+    return render_template('cookies.html')
+
 if __name__ == '__main__':
-    init_database()  # Single initialization point
+    init_database()
     app.run(debug=True)
