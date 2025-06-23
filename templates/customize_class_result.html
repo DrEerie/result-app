@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customize Class Result PDF</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-green-50 min-h-screen">
+    {% include '_header.html' %}
+    
+    <div class="container mx-auto p-4 md:p-6">
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+            <h1 class="text-3xl font-bold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600">
+                🎨 Customize Class Result PDF
+            </h1>
+
+            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                <!-- Institute Details -->
+                <div class="bg-gray-50 rounded-xl p-6 space-y-4">
+                    <h2 class="text-xl font-semibold text-gray-700">📚 Institute Details</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Institute Name *</label>
+                            <input type="text" name="institute_name" required
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Exam Name *</label>
+                            <input type="text" name="exam_name" required
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Branding -->
+                <div class="bg-gray-50 rounded-xl p-6 space-y-4">
+                    <h2 class="text-xl font-semibold text-gray-700">🎨 Branding</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">School Logo</label>
+                            <input type="file" name="logo" accept="image/*"
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Colors -->
+                <div class="bg-gray-50 rounded-xl p-6 space-y-4">
+                    <h2 class="text-xl font-semibold text-gray-700">🎨 Colors</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Main Color</label>
+                            <input type="color" name="main_color" value="#1E40AF"
+                                class="w-full h-10 rounded-lg cursor-pointer">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Table Header Color</label>
+                            <input type="color" name="header_color" value="#E5E7EB"
+                                class="w-full h-10 rounded-lg cursor-pointer">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Border Color</label>
+                            <input type="color" name="border_color" value="#D1D5DB"
+                                class="w-full h-10 rounded-lg cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layout Options -->
+                <div class="bg-gray-50 rounded-xl p-6 space-y-4">
+                    <h2 class="text-xl font-semibold text-gray-700">📋 Layout Options</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Subject Display</label>
+                            <select name="subject_display" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="all">Show All Subjects</option>
+                                <option value="core">Core Subjects Only</option>
+                                <option value="custom">Custom Selection</option>
+                            </select>
+                        </div>
+                        <div id="custom-subjects" class="hidden">
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {% for subject in subjects %}
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="selected_subjects" value="{{ subject.id }}"
+                                        class="text-blue-600 focus:ring-blue-500">
+                                    <span class="ml-2">{{ subject.name }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Signatories -->
+                <div class="bg-gray-50 rounded-xl p-6 space-y-4">
+                    <h2 class="text-xl font-semibold text-gray-700">✍️ Signatories</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Principal Name</label>
+                            <input type="text" name="principal_name"
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Class Teacher Name</label>
+                            <input type="text" name="teacher_name"
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Class Remarks -->
+                <div class="bg-gray-50 rounded-xl p-6 space-y-4">
+                    <h2 class="text-xl font-semibold text-gray-700">💭 Class Remarks</h2>
+                    <div>
+                        <textarea name="class_remarks" rows="3"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter general remarks for the class..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-center">
+                    <button type="submit"
+                        class="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-8 py-3 rounded-xl font-medium transform hover:scale-105 transition-all duration-200">
+                        Generate Class PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% include '_footer.html' %}
+
+    <script>
+        // Toggle custom subjects section
+        document.querySelector('select[name="subject_display"]').addEventListener('change', function() {
+            const customSubjectsDiv = document.getElementById('custom-subjects');
+            customSubjectsDiv.classList.toggle('hidden', this.value !== 'custom');
+        });
+    </script>
+</body>
+</html>

@@ -5,6 +5,8 @@ from utils.pdf_generator import generate_result_pdf, generate_class_pdf
 from datetime import datetime
 import os
 import io
+from werkzeug.utils import secure_filename
+from tempfile import NamedTemporaryFile
 
 # Add import for Excel export
 try:
@@ -691,6 +693,257 @@ def terms():
 @app.route('/cookies')
 def cookies():
     return render_template('cookies.html')
+
+# Add new routes for PDF customization
+@app.route('/customize_result/<int:student_id>', methods=['GET', 'POST'])
+def customize_result(student_id):
+    """
+    Render result customization page for a student.
+    Handles both GET (show form) and POST (submit customization form).
+    """
+    student = Student.query.get_or_404(student_id)
+    if request.method == 'POST':
+        results = Result.query.filter_by(student_id=student.id).all()
+        overall_result = calculate_student_overall_result(results)
+
+        # Handle uploaded files
+        logo = request.files.get('logo')
+        student_photo = request.files.get('student_photo')
+        watermark_img = request.files.get('watermark_img')
+        logo_path = None
+        photo_path = None
+        watermark_img_path = None
+
+        try:
+            if logo and logo.filename:
+                with NamedTemporaryFile(delete=False, suffix=os.path.splitext(logo.filename)[1]) as tmp_logo:
+                    logo.save(tmp_logo.name)
+                    logo_path = tmp_logo.name
+            if student_photo and student_photo.filename:
+                with NamedTemporaryFile(delete=False, suffix=os.path.splitext(student_photo.filename)[1]) as tmp_photo:
+                    student_photo.save(tmp_photo.name)
+                    photo_path = tmp_photo.name
+            if watermark_img and watermark_img.filename:
+                with NamedTemporaryFile(delete=False, suffix=os.path.splitext(watermark_img.filename)[1]) as tmp_wm:
+                    watermark_img.save(tmp_wm.name)
+                    watermark_img_path = tmp_wm.name
+
+            customization_data = {
+                'institute_name': request.form.get('institute_name'),
+                'exam_name': request.form.get('exam_name'),
+                'main_color': request.form.get('main_color', '#1E40AF'),
+                'header_color': request.form.get('header_color', '#E5E7EB'),
+                'border_color': request.form.get('border_color', '#D1D5DB'),
+                'principal_name': request.form.get('principal_name'),
+                'teacher_name': request.form.get('teacher_name'),
+                'remarks_type': request.form.get('remarks_type'),
+                'remarks': request.form.get('remarks'),
+                'logo': logo_path,
+                'student_photo': photo_path,
+                # Watermark options
+                'watermark_type': request.form.get('watermark_type'),  # 'text' or 'image'
+                'watermark_text': request.form.get('watermark_text'),
+                'watermark_img': watermark_img_path
+            }
+
+            student_data = {
+                'name': student.name,
+                'roll_no': student.roll_no,
+                'cls': student.cls,
+                'section': student.section,
+                'days_present': student.days_present,
+                'max_days': student.max_days,
+                'overall_result': overall_result
+            }
+
+            filename = f"result_{student.roll_no}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+            pdf_dir = os.path.join(app.static_folder, 'pdfs')
+            os.makedirs(pdf_dir, exist_ok=True)
+            pdf_path = os.path.join(pdf_dir, filename)
+
+            generate_result_pdf(student_data, pdf_path, customization_data)
+
+            return send_file(pdf_path, as_attachment=True)
+        finally:
+            # Clean up temp files
+            if logo_path and os.path.exists(logo_path):
+                os.remove(logo_path)
+            if photo_path and os.path.exists(photo_path):
+                os.remove(photo_path)
+            if watermark_img_path and os.path.exists(watermark_img_path):
+                os.remove(watermark_img_path)
+
+    # Reminder: Ensure 'customize_result.html' is mobile responsive (handled in template)
+    return render_template('customize_result.html', student=student)
+
+@app.route('/generate_custom_result/<int:student_id>', methods=['POST'])
+def generate_custom_result(student_id):
+    """Generate customized PDF for a student"""
+    student = Student.query.get_or_404(student_id)
+    results = Result.query.filter_by(student_id=student.id).all()
+    overall_result = calculate_student_overall_result(results)
+
+    # Process uploaded files
+    logo = request.files.get('logo')
+    student_photo = request.files.get('student_photo')
+    watermark_img = request.files.get('watermark_img')
+    logo_path = None
+    photo_path = None
+    watermark_img_path = None
+
+    try:
+        if logo and logo.filename:
+            with NamedTemporaryFile(delete=False, suffix=os.path.splitext(logo.filename)[1]) as tmp_logo:
+                logo.save(tmp_logo.name)
+                logo_path = tmp_logo.name
+        if student_photo and student_photo.filename:
+            with NamedTemporaryFile(delete=False, suffix=os.path.splitext(student_photo.filename)[1]) as tmp_photo:
+                student_photo.save(tmp_photo.name)
+                photo_path = tmp_photo.name
+        if watermark_img and watermark_img.filename:
+            with NamedTemporaryFile(delete=False, suffix=os.path.splitext(watermark_img.filename)[1]) as tmp_wm:
+                watermark_img.save(tmp_wm.name)
+                watermark_img_path = tmp_wm.name
+
+        customization_data = {
+            'institute_name': request.form.get('institute_name'),
+            'exam_name': request.form.get('exam_name'),
+            'main_color': request.form.get('main_color', '#1E40AF'),
+            'header_color': request.form.get('header_color', '#E5E7EB'),
+            'border_color': request.form.get('border_color', '#D1D5DB'),
+            'principal_name': request.form.get('principal_name'),
+            'teacher_name': request.form.get('teacher_name'),
+            'remarks_type': request.form.get('remarks_type'),
+            'remarks': request.form.get('remarks'),
+            'logo': logo_path,
+            'student_photo': photo_path,
+            # Watermark options
+            'watermark_type': request.form.get('watermark_type'),
+            'watermark_text': request.form.get('watermark_text'),
+            'watermark_img': watermark_img_path
+        }
+
+        student_data = {
+            'name': student.name,
+            'roll_no': student.roll_no,
+            'cls': student.cls,
+            'section': student.section,
+            'days_present': student.days_present,
+            'max_days': student.max_days,
+            'overall_result': overall_result
+        }
+
+        filename = f"result_{student.roll_no}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        pdf_dir = os.path.join(app.static_folder, 'pdfs')
+        os.makedirs(pdf_dir, exist_ok=True)
+        pdf_path = os.path.join(pdf_dir, filename)
+
+        generate_result_pdf(student_data, pdf_path, customization_data)
+
+        return send_file(pdf_path, as_attachment=True)
+    finally:
+        if logo_path and os.path.exists(logo_path):
+            os.remove(logo_path)
+        if photo_path and os.path.exists(photo_path):
+            os.remove(photo_path)
+        if watermark_img_path and os.path.exists(watermark_img_path):
+            os.remove(watermark_img_path)
+
+@app.route('/customize_class_result/<cls>/<section>', methods=['GET', 'POST'])
+def customize_class_result(cls, section):
+    """Generate customized PDF for entire class"""
+    students = Student.query.filter_by(cls=cls, section=section).all()
+    if not students:
+        flash("No students found in this class!", "error")
+        return redirect(url_for('view_results'))
+    
+    if request.method == 'GET':
+        # Get all subjects for this class for template rendering
+        subject_results = Result.query.join(Student).filter(
+            Student.cls == cls,
+            Student.section == section
+        ).all()
+        subjects = list({r.subject.name: r.subject for r in subject_results}.values())
+        return render_template('customize_class_result.html', 
+                             cls=cls, section=section, subjects=subjects)
+
+    # Process uploaded files
+    logo = request.files.get('logo')
+    watermark_img = request.files.get('watermark_img')
+    logo_path = None
+    watermark_img_path = None
+
+    try:
+        if logo and logo.filename:
+            with NamedTemporaryFile(delete=False, suffix=os.path.splitext(logo.filename)[1]) as tmp_logo:
+                logo.save(tmp_logo.name)
+                logo_path = tmp_logo.name
+        if watermark_img and watermark_img.filename:
+            with NamedTemporaryFile(delete=False, suffix=os.path.splitext(watermark_img.filename)[1]) as tmp_wm:
+                watermark_img.save(tmp_wm.name)
+                watermark_img_path = tmp_wm.name
+
+        customization_data = {
+            'institute_name': request.form.get('institute_name'),
+            'exam_name': request.form.get('exam_name'),
+            'main_color': request.form.get('main_color', '#1E40AF'),
+            'header_color': request.form.get('header_color', '#E5E7EB'),
+            'border_color': request.form.get('border_color', '#D1D5DB'),
+            'principal_name': request.form.get('principal_name'),
+            'teacher_name': request.form.get('teacher_name'),
+            'class_remarks': request.form.get('class_remarks'),
+            'subject_display': request.form.get('subject_display'),
+            'selected_subjects': request.form.getlist('selected_subjects'),
+            'logo': logo_path,
+            # Watermark options
+            'watermark_type': request.form.get('watermark_type'),
+            'watermark_text': request.form.get('watermark_text'),
+            'watermark_img': watermark_img_path
+        }
+
+        class_data = {
+            'cls': cls,
+            'section': section,
+            'students': []
+        }
+
+        for student in students:
+            results = Result.query.filter_by(student_id=student.id).all()
+            overall_result = calculate_student_overall_result(results)
+            class_data['students'].append({
+                'name': student.name,
+                'roll_no': student.roll_no,
+                'days_present': student.days_present,
+                'max_days': student.max_days,
+                'overall_result': overall_result
+            })
+
+        filename = f"class_{cls}_{section}_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        pdf_dir = os.path.join(app.static_folder, 'pdfs')
+        os.makedirs(pdf_dir, exist_ok=True)
+        pdf_path = os.path.join(pdf_dir, filename)
+
+        generate_class_pdf(class_data, pdf_path, customization_data)
+
+        return send_file(pdf_path, as_attachment=True)
+    finally:
+        if logo_path and os.path.exists(logo_path):
+            os.remove(logo_path)
+        if watermark_img_path and os.path.exists(watermark_img_path):
+            os.remove(watermark_img_path)
+
+@app.route('/delete_student/<int:student_id>', methods=['POST'])
+def delete_student_result(student_id):
+    """Delete a specific student and their results"""
+    try:
+        student = Student.query.get_or_404(student_id)
+        delete_student(student)
+        db.session.commit()
+        flash(f"Successfully deleted result for {student.name} (Roll: {student.roll_no})", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error deleting result: {str(e)}", "error")
+    return redirect(url_for('view_results'))
 
 if __name__ == '__main__':
     init_database()
