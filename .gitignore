@@ -35,3 +35,6 @@ static/pdf/**/*.pdf
 
 # Other project
 result2app/
+
+# ignore .env files
+.env

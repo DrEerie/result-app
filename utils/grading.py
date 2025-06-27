@@ -1,24 +1,41 @@
-def calculate_grade(percentage):
-    """
-    Calculate grade based on percentage
-    80% above: A+
-    70%-80%: A
-    60%-70%: B
-    50%-60%: C
-    40%-50%: D
-    Below 40%: F (Fail)
-    """
-    if percentage >= 80:
-        return 'A+'
-    elif percentage >= 70:
-        return 'A'
-    elif percentage >= 60:
-        return 'B'
-    elif percentage >= 50:
-        return 'C'
-    elif percentage >= 40:
-        return 'D'
-    else:
+from typing import Dict, List, Union
+import json
+import os
+
+# Load grading system from config
+def load_grading_config() -> Dict:
+    config_path = os.path.join(os.path.dirname(__file__), 'grading_config.json')
+    try:
+        with open(config_path) as f:
+            return json.load(f)
+    except:
+        return {
+            'A+': {'min': 80, 'max': 100},
+            'A': {'min': 70, 'max': 79.99},
+            'B': {'min': 60, 'max': 69.99},
+            'C': {'min': 50, 'max': 59.99},
+            'D': {'min': 40, 'max': 49.99},
+            'F': {'min': 0, 'max': 39.99}
+        }
+
+def calculate_grade(percentage: float) -> str:
+    """Calculate grade with input validation"""
+    try:
+        if not isinstance(percentage, (int, float)):
+            raise ValueError("Percentage must be a number")
+            
+        percentage = float(percentage)
+        if percentage < 0 or percentage > 100:
+            raise ValueError("Percentage must be between 0 and 100")
+            
+        grading_system = load_grading_config()
+        for grade, range_ in grading_system.items():
+            if range_['min'] <= percentage <= range_['max']:
+                return grade
+                
+        return 'F'
+    except Exception as e:
+        print(f"Error calculating grade: {str(e)}")
         return 'F'
 
 def calculate_percentage(marks, max_marks=100):

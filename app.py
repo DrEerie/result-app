@@ -1,12 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify
 from models.models import db, Student, Subject, Result, init_db, ClassSettings
 from utils.grading import calculate_student_overall_result, get_grade_color, get_result_status_color
-from utils.pdf_generator import generate_result_pdf, generate_class_pdf
+from utils.marksheet_pdf import generate_result_pdf
+from utils.class_result_pdf import generate_class_pdf
 from datetime import datetime
 import os
 import io
 from werkzeug.utils import secure_filename
 from tempfile import NamedTemporaryFile
+from functools import wraps
+from flask_caching import Cache
 
 # Add import for Excel export
 try:
@@ -15,14 +18,14 @@ except ImportError:
     openpyxl = None
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key_change_this_in_production'
+# Attempt to get the SECRET_KEY from an environment variable
+secret_key = os.environ.get('SECRET_KEY')
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 db_path = os.path.join(basedir, 'database')
 os.makedirs(db_path, exist_ok=True)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(db_path, 'result.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db.init_app(app)
 
 # Updated and consistent subject mapping for different classes
@@ -38,71 +41,83 @@ CLASS_SUBJECTS = {
     '6': ['English', 'Math', 'Science', 'Social Studies'],
     '7': ['English', 'Math', 'Science', 'Social Studies'],
     '8': ['English', 'Math', 'Science', 'Social Studies'],
-    '9': ['Physics', 'Chemistry', 'Math', 'Biology'],
+    '9': ['Physics', 'Chemistry', 'Math', 'Biology',],
     '10': ['Physics', 'Chemistry', 'Math', 'Biology'],
     '11': ['Physics', 'Chemistry', 'Math', 'Biology'],
     '12': ['Physics', 'Chemistry', 'Math', 'Biology']
 }
 
+cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache'})
+
+def validate_request(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not request.form:
+            flash("Invalid request data", "error")
+            return redirect(url_for('home'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.route('/')
 def home():
-    # Get stats for dashboard
-    with app.app_context():
-        total_students = Student.query.count()
-        total_results = Result.query.count()
-        
-        # Get unique classes and subjects
-        classes = db.session.query(Student.cls).distinct().count()
-        subjects = Subject.query.count()
-    
-    stats = {
-        'total_students': total_students,
-        'total_classes': classes,
-        'total_subjects': subjects,
-        'total_results': total_results
-    }
-    
-    return render_template('home.html', stats=stats)
+    return render_template('home.html')
 
 @app.route('/enter', methods=['GET', 'POST'])
 def enter_result():
     if request.method == 'POST':
-        try:
-            name = request.form.get('student_name', '').strip()
-            roll_no = request.form.get('roll_no', '').strip()
-            cls = request.form.get('cls', '').strip()
-            section = request.form.get('section', '').strip()
-            days_present = int(request.form.get('days_present', 0))
-            action = request.form.get('action_type', 'insert')
-
-            # Get max_days from class settings
-            class_settings = ClassSettings.query.filter_by(class_name=cls).first()
-            max_days = class_settings.max_days if class_settings else 200
-            
-            # Validation
-            if not all([name, roll_no, cls, section]):
-                flash("All fields are required!", "error")
-                return render_template('enter_result.html', prefill=request.form)
-
+        @validate_request
+        def handle_post():
             try:
-                if days_present < 0 or days_present > max_days:
-                    raise ValueError
-            except ValueError:
-                flash(f"Days present must be between 0 and {max_days}", "error")
-                return render_template('enter_result.html', prefill=request.form)
-            
-            # Check if student exists
-            existing_student = Student.query.filter_by(roll_no=roll_no).first()
-            
-            if existing_student and action == 'insert':
-                return render_template('enter_result.html', 
-                                     existing_roll=roll_no, 
-                                     prefill=request.form)
+                name = request.form.get('student_name', '').strip()
+                roll_no = request.form.get('roll_no', '').strip()
+                cls = request.form.get('cls', '').strip()
+                section = request.form.get('section', '').strip()
+                days_present = int(request.form.get('days_present', 0))
+                action = request.form.get('action_type', 'insert')
+            # Get max_days from class settings
+                class_settings = ClassSettings.query.filter_by(class_name=cls).first()
+                max_days = class_settings.max_days if class_settings else 200
+            # Validation
+                if not all([name, roll_no, cls, section]):
+                    flash("All fields are required!", "error")
+                    return render_template('enter_result.html', prefill=request.form)
 
-            # Handle different actions
-            if existing_student:
-                if action == 'delete':
-                    delete_student(existing_student)
+                try:
+                    if days_present < 0 or days_present > max_days:
+                        raise ValueError
+                except ValueError:
+                    flash(f"Days present must be between 0 and {max_days}", "error")
+                    return render_template('enter_result.html', prefill=request.form)
+
+                # Check if student exists
+                existing_student = Student.query.filter_by(roll_no=roll_no).first()
+
+                if existing_student and action == 'insert':
+                    return render_template('enter_result.html', 
+                                         existing_roll=roll_no, 
+                                         prefill=request.form)
+            
+                # Handle different actions
+                if existing_student:
+                    if action == 'delete':
+                        delete_student(existing_student)
+                        student = Student(
+                            name=name, 
+                            roll_no=roll_no, 
+                            cls=cls, 
+                            section=section,
+                            days_present=days_present,
+                            max_days=max_days
+                        )
+                        db.session.add(student)
+                    elif action == 'overwrite':
+                        existing_student.name = name
+                        existing_student.cls = cls
+                        existing_student.section = section
+                        existing_student.days_present = days_present
+                        existing_student.max_days = max_days
+                        student = existing_student
+                else:
                     student = Student(
                         name=name, 
                         roll_no=roll_no, 
@@ -112,43 +127,26 @@ def enter_result():
                         max_days=max_days
                     )
                     db.session.add(student)
-                elif action == 'overwrite':
-                    existing_student.name = name
-                    existing_student.cls = cls
-                    existing_student.section = section
-                    existing_student.days_present = days_present
-                    existing_student.max_days = max_days
-                    student = existing_student
-            else:
-                student = Student(
-                    name=name, 
-                    roll_no=roll_no, 
-                    cls=cls, 
-                    section=section,
-                    days_present=days_present,
-                    max_days=max_days
-                )
-                db.session.add(student)
 
-            db.session.commit()
-            
-            # Add results
-            marks_added = add_results(student, cls, request.form)
-            
-            if marks_added:
-                flash(f"✅ Result for {name} (Roll: {roll_no}) added successfully!", "success")
-            else:
-                flash("⚠️ Student added but no marks were entered!", "warning")
-                
-            return redirect(url_for('enter_result'))
-            
-        except Exception as e:
-            db.session.rollback()
-            flash(f"❌ Error: {str(e)}", "error")
-            return render_template('enter_result.html', 
-                                 class_subjects=CLASS_SUBJECTS,
-                                 prefill=request.form)
-    
+                db.session.commit()
+
+                # Add results
+                marks_added = add_results(student, cls, request.form)
+
+                if marks_added:
+                    flash(f" Result for {name} (Roll: {roll_no}) added successfully!", "success")
+                else:
+                    flash(" Student added but no marks were entered!", "warning")
+
+                return redirect(url_for('enter_result'))
+
+            except Exception as e:
+                db.session.rollback()
+                flash(f"❌ Error: {str(e)}", "error")
+                return render_template('enter_result.html', 
+                                     class_subjects=CLASS_SUBJECTS,
+                                     prefill=request.form)
+        return handle_post()
     return render_template('enter_result.html', class_subjects=CLASS_SUBJECTS)
 
 def delete_student(student):
@@ -201,8 +199,7 @@ def add_results(student, cls, form_data):
 def view_results():
     """View all student results with grades and calculations"""
     students = Student.query.all()
-    
-    # Prepare students data with calculated results
+# Prepare students data with calculated results
     students_data = []
     for student in students:
         # Get all results for this student
@@ -244,8 +241,7 @@ def student_detail(student_id):
     student = Student.query.get_or_404(student_id)
     results = Result.query.filter_by(student_id=student.id).all()
     overall_result = calculate_student_overall_result(results)
-    
-    # Add color classes
+ # Add color classes
     overall_result['grade_color'] = get_grade_color(overall_result['overall_grade'])
     overall_result['status_color'] = get_result_status_color(overall_result['is_pass'])
     
@@ -262,7 +258,6 @@ def download_pdf(student_id):
     student = Student.query.get_or_404(student_id)
     results = Result.query.filter_by(student_id=student.id).all()
     overall_result = calculate_student_overall_result(results)
-    
     student_data = {
         'name': student.name,
         'roll_no': student.roll_no,
@@ -272,18 +267,14 @@ def download_pdf(student_id):
         'max_days': student.max_days,
         'overall_result': overall_result
     }
-    
     # Create PDFs directory if it doesn't exist
     pdf_dir = os.path.join(app.static_folder, 'pdfs')
     os.makedirs(pdf_dir, exist_ok=True)
-    
     # Generate PDF filename
-    filename = f"result_{student.roll_no}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    filename = f"MarkSheet_{student.name}_{student.cls}_{student.roll_no}_{datetime.now().strftime('%Y-%m-%d_%H-%M')}.pdf"
     pdf_path = os.path.join(pdf_dir, filename)
-    
     # Generate PDF
     generate_result_pdf(student_data, pdf_path)
-    
     # Send file
     return send_file(pdf_path, as_attachment=True)
 
@@ -377,16 +368,14 @@ def download_class_pdf(cls, section):
             'max_days': student.max_days,
             'overall_result': overall_result
         })
-    
     # Generate PDF filename
-    filename = f"class_{cls}_{section}_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    filename = f"class_{cls}_{section}_ResultSheet_{datetime.now().strftime('%Y-%m-%d_%H-%M')}.pdf"
     pdf_dir = os.path.join(app.static_folder, 'pdfs')
     os.makedirs(pdf_dir, exist_ok=True)
     pdf_path = os.path.join(pdf_dir, filename)
-    
     # Generate class PDF
     generate_class_pdf(class_data, pdf_path)
-    
+    # Send file
     return send_file(pdf_path, as_attachment=True)
 
 @app.route('/clear_history', methods=['POST'])
@@ -462,11 +451,9 @@ def analytics():
     students = Student.query.all()
     subjects = Subject.query.all()
     results = Result.query.all()
-
     # Calculate attendance statistics
     good_attendance_count = sum(1 for s in students if (s.days_present / s.max_days * 100) >= 75)
     poor_attendance_count = len(students) - good_attendance_count
-
     # Class-wise average marks
     class_averages = {}
     for student in students:
@@ -475,7 +462,7 @@ def analytics():
         count = len(student_results)
         if count:
             class_averages.setdefault(student.cls, []).append(total / count)
-    
+
     class_avg_data = [
         {"cls": cls, "avg": round(sum(vals)/len(vals), 2) if vals else 0}
         for cls, vals in class_averages.items()
@@ -682,6 +669,7 @@ def init_database():
 
 # API endpoint definitions above...
 
+# bottom of footer related files path.
 @app.route('/privacy')
 def privacy():
     return render_template('privacy.html')
@@ -698,7 +686,7 @@ def cookies():
 @app.route('/customize_result/<int:student_id>', methods=['GET', 'POST'])
 def customize_result(student_id):
     """
-    Render result customization page for a student.
+    Render result customization page for a student i.e. customize marksheet.
     Handles both GET (show form) and POST (submit customization form).
     """
     student = Student.query.get_or_404(student_id)
@@ -730,7 +718,6 @@ def customize_result(student_id):
 
             customization_data = {
                 'institute_name': request.form.get('institute_name'),
-                'exam_name': request.form.get('exam_name'),
                 'main_color': request.form.get('main_color', '#1E40AF'),
                 'header_color': request.form.get('header_color', '#E5E7EB'),
                 'border_color': request.form.get('border_color', '#D1D5DB'),
