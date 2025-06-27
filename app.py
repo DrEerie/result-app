@@ -4,8 +4,7 @@ from utils.grading import calculate_student_overall_result, get_grade_color, get
 from utils.marksheet_pdf import generate_result_pdf
 from utils.class_result_pdf import generate_class_pdf
 from datetime import datetime
-import os
-import io
+import os, io
 from werkzeug.utils import secure_filename
 from tempfile import NamedTemporaryFile
 from functools import wraps
@@ -21,12 +20,7 @@ app = Flask(__name__)
 # Attempt to get the SECRET_KEY from an environment variable
 secret_key = os.environ.get('SECRET_KEY')
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-db_path = os.path.join(basedir, 'database')
-os.makedirs(db_path, exist_ok=True)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(db_path, 'result.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db.init_app(app)
+# removed old sqlite path and related stuff since now gonna use postgre 
 
 # Updated and consistent subject mapping for different classes
 CLASS_SUBJECTS = {
@@ -100,7 +94,7 @@ def enter_result():
                 # Handle different actions
                 if existing_student:
                     if action == 'delete':
-                        delete_student(existing_student)
+                     #   delete_student(existing_student) delete_student function is transfered to routes/result.py
                         student = Student(
                             name=name, 
                             roll_no=roll_no, 
@@ -149,10 +143,7 @@ def enter_result():
         return handle_post()
     return render_template('enter_result.html', class_subjects=CLASS_SUBJECTS)
 
-def delete_student(student):
-    """Delete student and all their results"""
-    Result.query.filter_by(student_id=student.id).delete()
-    db.session.delete(student)
+# delete_student funstion is transfered to routes/result.py
 
 def overwrite_student(student, name, cls, section):
     """Update student info and delete old results"""
@@ -670,17 +661,9 @@ def init_database():
 # API endpoint definitions above...
 
 # bottom of footer related files path.
-@app.route('/privacy')
-def privacy():
-    return render_template('privacy.html')
-
-@app.route('/terms')
-def terms():
-    return render_template('terms.html')
-
-@app.route('/cookies')
-def cookies():
-    return render_template('cookies.html')
+# privacy routes is transfered to routes/main_routes.py
+# terms routes is transfered to	routes/main_routes.py
+# cookies routes is  transfered  to	routes/main_routes.py
 
 # Add new routes for PDF customization
 @app.route('/customize_result/<int:student_id>', methods=['GET', 'POST'])
@@ -909,29 +892,21 @@ def customize_class_result(cls, section):
         pdf_dir = os.path.join(app.static_folder, 'pdfs')
         os.makedirs(pdf_dir, exist_ok=True)
         pdf_path = os.path.join(pdf_dir, filename)
-
         generate_class_pdf(class_data, pdf_path, customization_data)
-
         return send_file(pdf_path, as_attachment=True)
     finally:
         if logo_path and os.path.exists(logo_path):
             os.remove(logo_path)
         if watermark_img_path and os.path.exists(watermark_img_path):
             os.remove(watermark_img_path)
-
-@app.route('/delete_student/<int:student_id>', methods=['POST'])
-def delete_student_result(student_id):
-    """Delete a specific student and their results"""
-    try:
-        student = Student.query.get_or_404(student_id)
-        delete_student(student)
-        db.session.commit()
-        flash(f"Successfully deleted result for {student.name} (Roll: {student.roll_no})", "success")
-    except Exception as e:
-        db.session.rollback()
-        flash(f"Error deleting result: {str(e)}", "error")
-    return redirect(url_for('view_results'))
-
+#delete_student function is transfer to routes/results.py
 if __name__ == '__main__':
     init_database()
     app.run(debug=True)
+
+# Function Name	Also in File(s)
+# view_results	routes/results.py
+# student_detail	routes/results.py
+# bulk_entry	routes/results.py
+# edit_result	routes/results.py
+# customize_class_result	routes/settings.py
