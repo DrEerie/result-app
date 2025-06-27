@@ -37,56 +37,6 @@ A scalable, modern, responsive web application for managing student results, ana
   - Interactive form elements
   - Secure data validation
 
-## Project Structure (old)📁
-
-```
-result-app/
-├── templates/
-│   ├── _header.html                # Global header component
-│   ├── _footer.html                # Global footer component
-│   ├── home.html                   # Landing page
-│   ├── enter_result.html           # Single result entry
-│   ├── bulk_entry.html             # Bulk result import
-│   ├── view_result.html            # Result viewing interface
-│   ├── customization.html          # Customization (was Subject Management)
-│   ├── customize_result.html       # Marksheet (individual result pdf) customization
-│   ├── customizae_class_result.html    # Class ResultSheet pdf customization
-│   ├── edit_result.html            # Edit result for changes in DB
-│   ├── privacy.html                # Telling about Privacy Policies
-│   ├── terms.html                  # Telling terms of usage etc.
-│   ├── cookies.html                # Telling cookies polices.
-│   ├── student_detail.html         # Individual Student Result Preview
-│   └── analytics.html              # Analytics dashboard
-├── static/
-│   ├── css/                    # Custom styling (using Tailwind CDN) so empty.
-│   ├── pdfs/                   # auto-generated result pdfs by users.
-|   ├── images/                 # for including like logo, favicon etc. in future.
-│   └── js/                     # JavaScript functionality (empty since all in files)
-├── models/
-│   └── models.py               # Database models
-├── utils/
-│   ├── class_result_pdf.py     # Class ResultSheet Generation
-│   ├── marksheet_pdf.py        # MarkSheet Generation
-│   └── grading.py              # Grade calculation logic
-├── database/
-│   └── result.db               # SQLite database
-├── images/
-│   └── #empty   # May be include related like logo, favicon etc. in future.
-├── app.py              # Main Flask application
-└── requirements.txt    # Python dependencies
-```
-
-## Setup & Installation 🛠️
-
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Run the application:
-   ```bash
-   python app.py
-   ```
 
 ## Upcoming Features 🔮
 
@@ -113,7 +63,8 @@ result-app/
    - Audit logging
    - Enhanced validation
 
-#Upcoming SaaS project folder structure:
+## Project folder structure: :folder:
+
 ```
 result-app/
 ├─ app/
@@ -197,3 +148,5 @@ result-app/
 ├─ .env                      # Environment settings (SECRET_KEY, DB_URL, etc.)
 ├─ requirements.txt
 ```
+
+
