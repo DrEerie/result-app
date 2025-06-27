@@ -91,6 +91,7 @@ result-app/
 │  └─ class_settings.py     # ClassSettings model
 ├─ services/
 |  └─ __init__.py
+│  └─ base_service.py         # Common logics for all services 
 │  └─ result_service.py       # Business logic related to result
 │  └─ student_service.py      # Business logic related to students
 │  └─ analytics_service.py    # Business logic related to analytics
@@ -101,6 +102,7 @@ result-app/
 │  └─ class_result_pdf.py     # Class-Sheet Generation Logic
 │  └─ marksheet_pdf.py        # Marksheet Generation Logic
 │  └─ grading.py              # Logic for calculations like grading, ranking
+│  └─ error_handlers.py       # Common error handlers
 │  └─ validations.py          # Common Validations
 ├─ routes/
 │  └─ __init__.py             # Import all Blueprints
