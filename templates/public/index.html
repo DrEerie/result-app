@@ -140,7 +140,7 @@
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
     <!-- Include Header -->
-    {% include '_public_header.html' %}
+    {% include 'public/_public_header.html' %}
 
     <!-- Hero Section -->
     <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -190,11 +190,11 @@
                         <div class="text-gray-600 dark:text-gray-400">Schools Trust Us</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-3xl md:text-4xl font-bold gradient-text counter">99.9%</div>
+                        <div class="text-3xl md:text-4xl font-bold gradient-text counter"> 99.9% </div>
                         <div class="text-gray-600 dark:text-gray-400">Uptime</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-3xl md:text-4xl font-bold gradient-text counter">24/7</div>
+                        <div class="text-3xl md:text-4xl font-bold gradient-text counter"> 24/7 </div>
                         <div class="text-gray-600 dark:text-gray-400">Support</div>
                     </div>
                 </div>
@@ -830,25 +830,8 @@
             });
         }
 
-        // Load header content
-        async function loadHeader() {
-            try {
-                const response = await fetch('templates/public/_public_header.html');
-                const headerContent = await response.text();
-                document.getElementById('header-placeholder').innerHTML = headerContent;
-                
-                // Initialize dark mode after header is loaded
-                initDarkMode();
-                lucide.createIcons();
-            } catch (error) {
-                console.log('Header file not found, using inline header');
-                // Fallback inline header will be created separately
-            }
-        }
-
         // Initialize everything when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            loadHeader();
             animateCounters();
             initScrollAnimations();
             

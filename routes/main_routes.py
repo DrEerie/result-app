@@ -7,8 +7,6 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 def index():
     """Marketing landing page"""
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard.index'))
     return render_template('public/index.html')
 
 @main_bp.route('/pricing')

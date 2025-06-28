@@ -7,7 +7,7 @@ import uuid
 
 db = SQLAlchemy()
 
-class User(db.Model):
+class User(UserMixin, db.Model):  # Add UserMixin here
     __tablename__ = 'users'
     
     id = db.Column(UUID(as_uuid=True), primary_key=True)  # Links to Supabase auth.users
@@ -30,6 +30,23 @@ class User(db.Model):
     
     def __repr__(self):
         return f'<User {self.email}>'
+    
+    # Flask-Login required methods
+    def get_id(self):
+        """Return the user ID as a string"""
+        return str(self.id)
+    
+    def is_authenticated(self):
+        """Return True if user is authenticated"""
+        return True
+    
+    def is_anonymous(self):
+        """Return True if user is anonymous"""
+        return False
+    
+    def is_active_user(self):
+        """Return True if user account is active"""
+        return self.is_active
     
     @property
     def is_admin(self):

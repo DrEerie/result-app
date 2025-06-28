@@ -1,0 +1,183 @@
+<!-- Public Header Component -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 transition-all duration-300">
+    <div class="container mx-auto px-6">
+        <div class="flex items-center justify-between h-16">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <i data-lucide="graduation-cap" class="w-5 h-5 text-white"></i>
+                </div>
+                <span class="text-xl font-bold gradient-text">ResultApp</span>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#features" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">
+                    Features
+                </a>
+                <a href="#pricing" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">
+                    Pricing
+                </a>
+                <a href="#testimonials" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">
+                    Testimonials
+                </a>
+                <a href="#faq" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">
+                    FAQ
+                </a>
+                <a href="/docs" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">
+                    Docs
+                </a>
+            </nav>
+            
+            <!-- Right Side Actions -->
+            <div class="flex items-center space-x-4">
+                <!-- Dark Mode Toggle -->
+                <button id="darkModeToggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300">
+                    <i data-lucide="moon" class="w-5 h-5"></i>
+                </button>
+                
+                <!-- Desktop Auth Buttons -->
+                <div class="hidden md:flex items-center space-x-3">
+                    <a href="/login" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">
+                        Login
+                    </a>
+                    <a href="/register" class="gradient-border group">
+                        <div class="bg-white dark:bg-gray-900 rounded-lg px-4 py-2 font-medium text-sm transition-all duration-300 group-hover:bg-opacity-90">
+                            Sign Up Free
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Mobile Menu Toggle -->
+                <button class="md:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300" onclick="toggleMobileMenu()">
+                    <i data-lucide="menu" class="w-5 h-5" id="hamburger"></i>
+                    <i data-lucide="x" class="w-5 h-5 hidden" id="close"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+        <div class="container mx-auto px-6 py-4">
+            <nav class="flex flex-col space-y-4">
+                <a href="#features" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium py-2" onclick="toggleMobileMenu()">
+                    Features
+                </a>
+                <a href="#pricing" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium py-2" onclick="toggleMobileMenu()">
+                    Pricing
+                </a>
+                <a href="#testimonials" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium py-2" onclick="toggleMobileMenu()">
+                    Testimonials
+                </a>
+                <a href="#faq" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium py-2" onclick="toggleMobileMenu()">
+                    FAQ
+                </a>
+                <a href="/docs" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium py-2" onclick="toggleMobileMenu()">
+                    Documentation
+                </a>
+                
+                <!-- Mobile Auth Buttons -->
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+                    <a href="/login" class="block w-full text-center py-3 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium" onclick="toggleMobileMenu()">
+                        Login
+                    </a>
+                    <a href="/register" class="block w-full mt-2" onclick="toggleMobileMenu()">
+                        <div class="gradient-border">
+                            <div class="bg-white dark:bg-gray-900 rounded-lg px-4 py-3 font-medium text-center transition-all duration-300">
+                                Sign Up Free
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<!-- Header Spacer -->
+<div class="h-16"></div>
+
+<style>
+    /* Additional styles for header */
+    .gradient-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .gradient-border {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        padding: 2px;
+        border-radius: 8px;
+    }
+
+    /* Header backdrop blur fallback */
+    @supports not (backdrop-filter: blur(12px)) {
+        header {
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .dark header {
+            background: rgba(17, 24, 39, 0.95);
+        }
+    }
+
+    /* Smooth mobile menu animation */
+    #mobileMenu {
+        transition: all 0.3s ease-in-out;
+        transform-origin: top;
+    }
+
+    #mobileMenu.hidden {
+        transform: scaleY(0);
+        opacity: 0;
+    }
+
+    #mobileMenu:not(.hidden) {
+        transform: scaleY(1);
+        opacity: 1;
+    }
+
+    /* Header scroll effect */
+    .header-scrolled {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark .header-scrolled {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+</style>
+
+<script>
+    // Header scroll effect
+    window.addEventListener('scroll', function() {
+        const header = document.querySelector('header');
+        if (window.scrollY > 50) {
+            header.classList.add('header-scrolled');
+        } else {
+            header.classList.remove('header-scrolled');
+        }
+    });
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuToggle = event.target.closest('[onclick="toggleMobileMenu()"]');
+        
+        if (!mobileMenu.contains(event.target) && !menuToggle && !mobileMenu.classList.contains('hidden')) {
+            toggleMobileMenu();
+        }
+    });
+
+    // Close mobile menu on escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const mobileMenu = document.getElementById('mobileMenu');
+            if (!mobileMenu.classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
+        }
+    });
+</script>

@@ -39,6 +39,12 @@ def create_app(config_class=Config):
     login_manager.login_view = 'auth.login'
     login_manager.login_message_category = 'info'
 
+    # Register user_loader callback - FIXED
+    @login_manager.user_loader
+    def load_user(user_id):
+        from auth.models import User
+        return User.query.get(user_id)
+
     # Register blueprints
     from routes.main_routes import main_bp
     from routes.auth import auth
