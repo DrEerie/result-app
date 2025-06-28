@@ -1,20 +1,33 @@
 # models/base.py
-from flask_sqlalchemy import SQLAlchemy
+from models import db
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 import uuid
-
-db = SQLAlchemy()
+from sqlalchemy.ext.declarative import declared_attr
 
 class BaseModel(db.Model):
     """Base model with common fields for multi-tenancy"""
     __abstract__ = True
     
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    organization_id = db.Column(UUID(as_uuid=True), db.ForeignKey('organizations.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    deleted_at = db.Column(db.DateTime, nullable=True)
+    @declared_attr
+    def id(cls):
+        return db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+
+    @declared_attr
+    def organization_id(cls):
+        return db.Column(UUID(as_uuid=True), db.ForeignKey('organizations.id'), nullable=False)
+
+    @declared_attr
+    def created_at(cls):
+        return db.Column(db.DateTime, default=datetime.utcnow)
+
+    @declared_attr
+    def updated_at(cls):
+        return db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    @declared_attr
+    def deleted_at(cls):
+        return db.Column(db.DateTime, nullable=True)
     
     def soft_delete(self):
         """Soft delete the record"""
@@ -33,6 +46,16 @@ class BaseModel(db.Model):
     def to_dict(self):
         """Convert model to dictionary"""
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    
+class Attendance(BaseModel):
+    """Model for student attendance records"""
+    __tablename__ = 'attendance'
+    
+    student_id = db.Column(UUID(as_uuid=True), db.ForeignKey('students.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    status = db.Column(db.String(20), nullable=False)  # present, absent, late
+    remarks = db.Column(db.Text)
+    recorded_by = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=False)
     
 # models/student.py
 from models.subject import Subject

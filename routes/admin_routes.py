@@ -2,7 +2,9 @@
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash, g
 from auth.decorators import login_required, admin_required
 from services.auth_service import AuthService
-from models.base import User, Subscription, UsageTracking, AuditLog
+from auth.models import User, Subscription
+from models.usage_tracker import UsageTracking
+from models.audit_logger import AuditLog
 from models.organization import Organization
 
 admin_bp = Blueprint('admin', __name__)
@@ -35,7 +37,8 @@ def add_user():
     """Add new user"""
     if request.method == 'POST':
         data = request.get_json() if request.is_json else request.form
-        
+        if data is None:
+            data = {}
         user_data = {
             'full_name': data.get('full_name'),
             'email': data.get('email'),
@@ -45,15 +48,12 @@ def add_user():
             'employee_id': data.get('employee_id'),
             'department': data.get('department')
         }
-        
         result = AuthService.create_user(user_data, g.organization_id)
-        
-        if result['success']:
+        if result.get('success'):
             flash('User created successfully!', 'success')
             return redirect(url_for('admin.manage_users')) if not request.is_json else jsonify({'success': True})
         else:
-            flash(result['error'], 'error')
-    
+            flash(result.get('error'), 'error')
     return render_template('admin/add_user.html')
 
 @admin_bp.route('/subscription')

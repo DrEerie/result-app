@@ -1,8 +1,9 @@
-# routes/auth.py (continuation)
+# routes/auth.py
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash, session
 from flask_login import login_user, logout_user, login_required, current_user
 from services.auth_service import AuthService
-from models.base import User, Organization
+from auth.models import User
+from models.organization import Organization
 import re
 
 auth_bp = Blueprint('auth', __name__)
@@ -12,6 +13,8 @@ def register():
     """Organization registration"""
     if request.method == 'POST':
         data = request.get_json() if request.is_json else request.form
+        if data is None:
+            data = {}
         
         # Validate required fields
         required_fields = ['org_name', 'org_email', 'admin_name', 'admin_email', 'admin_password']
@@ -20,7 +23,8 @@ def register():
                 return jsonify({'error': f'{field} is required'}), 400
         
         # Create slug from organization name
-        slug = re.sub(r'[^a-zA-Z0-9-]', '-', data['org_name'].lower())
+        org_name = data.get('org_name', '')
+        slug = re.sub(r'[^a-zA-Z0-9-]', '-', org_name.lower())
         slug = re.sub(r'-+', '-', slug).strip('-')
         
         # Check if organization already exists
@@ -29,17 +33,17 @@ def register():
         
         # Prepare data
         org_data = {
-            'name': data['org_name'],
+            'name': data.get('org_name'),
             'slug': slug,
-            'email': data['org_email'],
+            'email': data.get('org_email'),
             'phone': data.get('org_phone'),
             'address': data.get('org_address')
         }
         
         admin_data = {
-            'full_name': data['admin_name'],
-            'email': data['admin_email'],
-            'password': data['admin_password'],
+            'full_name': data.get('admin_name'),
+            'email': data.get('admin_email'),
+            'password': data.get('admin_password'),
             'phone': data.get('admin_phone')
         }
         
@@ -60,6 +64,8 @@ def login():
     """User login"""
     if request.method == 'POST':
         data = request.get_json() if request.is_json else request.form
+        if data is None:
+            data = {}
         
         email = data.get('email')
         password = data.get('password')
@@ -71,7 +77,7 @@ def login():
         
         if result['success']:
             next_page = request.args.get('next')
-            return redirect(next_page or url_for('main.dashboard')) if not request.is_json else jsonify({'success': True})
+            return redirect(next_page or url_for('main_bp.dashboard')) if not request.is_json else jsonify({'success': True})
         else:
             flash(result['error'], 'error')
             return redirect(url_for('auth.login')) if not request.is_json else jsonify({'error': result['error']}), 401
@@ -84,13 +90,15 @@ def logout():
     """User logout"""
     result = AuthService.logout_user()
     flash('You have been logged out successfully.', 'info')
-    return redirect(url_for('main.home'))
+    return redirect(url_for('main_bp.home'))
 
 @auth_bp.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     """Password reset request"""
     if request.method == 'POST':
         data = request.get_json() if request.is_json else request.form
+        if data is None:
+            data = {}
         email = data.get('email')
         
         if not email:
@@ -106,3 +114,5 @@ def forgot_password():
             return redirect(url_for('auth.forgot_password')) if not request.is_json else jsonify({'error': str(e)}), 400
     
     return render_template('auth/forgot_password.html')
+
+auth = auth_bp

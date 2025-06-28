@@ -1,6 +1,6 @@
 # middleware/tenant.py
 from flask import request, session, g, abort
-from models.base import User
+from auth.models import User
 import logging
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class TenantMiddleware:
             else:
                 session.clear()
                 abort(401)
-        elif request.endpoint and not request.endpoint.startswith(('main.', 'static')):
+        elif request.endpoint and not request.endpoint.startswith(('main_bp.', 'template/public')):
             # Require authentication for non-public routes
             abort(401)
     

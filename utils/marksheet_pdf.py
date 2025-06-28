@@ -15,6 +15,8 @@ import qrcode
 from io import BytesIO
 import os
 from datetime import datetime
+from typing import Dict, Any, List
+from services.pdf_service import BasePDFService
 
 # Enhanced PDF generation for academic results with modern styling. generate pdf-1
 def generate_result_pdf(student_data, output_path, customization_data=None):
@@ -648,3 +650,222 @@ def _create_compact_layout(student_data, customization_data, styles):
 def _create_compact_footer(student_data, customization_data, styles):
     """Create compact footer"""
     return _create_footer_section(student_data, customization_data, styles)
+
+class MarksheetPDFService(BasePDFService):
+    """Service for generating student marksheets"""
+    
+    def generate_marksheet(self, student_data: Dict[str, Any], results: List[Dict[str, Any]], 
+                         organization_data: Dict[str, Any], customization: Dict[str, Any]) -> BytesIO:
+        """Generate a student marksheet"""
+        elements = []
+        
+        # Add header
+        elements.extend(self._create_header_section(organization_data, customization))
+        elements.append(Spacer(1, 20))
+        
+        # Add student information
+        elements.extend(self._create_student_info_section(student_data))
+        elements.append(Spacer(1, 20))
+        
+        # Add results table
+        elements.extend(self._create_results_table(results))
+        elements.append(Spacer(1, 20))
+        
+        # Add performance analytics
+        if customization.get('show_analytics', True):
+            elements.extend(self._create_analytics_section(results))
+            elements.append(Spacer(1, 20))
+        
+        # Add remarks
+        if customization.get('show_remarks', True):
+            elements.extend(self._create_remarks_section(student_data.get('remarks', '')))
+            elements.append(Spacer(1, 20))
+        
+        # Add footer with signatures
+        elements.extend(self._create_footer_section(organization_data, customization))
+        
+        # Generate PDF
+        return self._generate_pdf(elements, organization_data, customization)
+    
+    def _create_student_info_section(self, student_data: Dict[str, Any]) -> List:
+        """Create student information section"""
+        elements = []
+        
+        # Student details table
+        student_info = [
+            ['Student Name:', student_data.get('name', 'N/A'), 'Roll Number:', student_data.get('roll_number', 'N/A')],
+            ['Class:', student_data.get('class_name', 'N/A'), 'Section:', student_data.get('section', 'N/A')],
+            ['Admission No:', student_data.get('admission_number', 'N/A'), 'Academic Year:', student_data.get('academic_year', 'N/A')]
+        ]
+        
+        info_table = Table(student_info, colWidths=[1.5*inch, 2*inch, 1.5*inch, 2*inch])
+        info_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+            ('BACKGROUND', (2, 0), (2, -1), colors.lightgrey),
+        ]))
+        
+        elements.append(info_table)
+        return elements
+    
+    def _create_results_table(self, results: List[Dict[str, Any]]) -> List:
+        """Create results table with subjects and marks"""
+        elements = []
+        
+        # Table header
+        header = ['Subject', 'Max Marks', 'Marks Obtained', 'Percentage', 'Grade']
+        
+        # Table data
+        data = [header]
+        total_marks = 0
+        total_max_marks = 0
+        
+        for result in results:
+            marks = result.get('marks', 0)
+            max_marks = result.get('max_marks', 100)
+            percentage = (marks / max_marks * 100) if max_marks > 0 else 0
+            grade = self._calculate_grade(percentage)
+            
+            data.append([
+                result.get('subject_name', 'N/A'),
+                str(max_marks),
+                str(marks),
+                f"{percentage:.1f}%",
+                grade
+            ])
+            
+            total_marks += marks
+            total_max_marks += max_marks
+        
+        # Add total row
+        total_percentage = (total_marks / total_max_marks * 100) if total_max_marks > 0 else 0
+        total_grade = self._calculate_grade(total_percentage)
+        data.append([
+            'Total',
+            str(total_max_marks),
+            str(total_marks),
+            f"{total_percentage:.1f}%",
+            total_grade
+        ])
+        
+        # Create table
+        table = Table(data, colWidths=[2*inch, 1.2*inch, 1.5*inch, 1.2*inch, 1*inch])
+        table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+            ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
+        ]))
+        
+        elements.append(table)
+        return elements
+    
+    def _create_analytics_section(self, results: List[Dict[str, Any]]) -> List:
+        """Create analytics section with charts"""
+        elements = []
+        
+        # Add bar chart for subject-wise performance
+        elements.append(Paragraph("Subject-wise Performance", self.styles['CustomNormal']))
+        elements.append(Spacer(1, 10))
+        elements.append(self._create_bar_chart(results))
+        elements.append(Spacer(1, 15))
+        
+        # Add pie chart for grade distribution
+        elements.append(Paragraph("Grade Distribution", self.styles['CustomNormal']))
+        elements.append(Spacer(1, 10))
+        elements.append(self._create_pie_chart(results))
+        
+        return elements
+    
+    def _create_remarks_section(self, remarks: str) -> List:
+        """Create remarks section"""
+        elements = []
+        
+        elements.append(Paragraph("Remarks", self.styles['CustomSubHeader']))
+        elements.append(Spacer(1, 10))
+        elements.append(Paragraph(remarks or "No remarks available.", self.styles['CustomNormal']))
+        
+        return elements
+    
+    def _create_bar_chart(self, results: List[Dict[str, Any]]) -> Drawing:
+        """Create bar chart for subject-wise performance"""
+        # Prepare data
+        subjects = [r.get('subject_name', '') for r in results]
+        percentages = [r.get('percentage', 0) for r in results]
+        
+        # Create drawing
+        drawing = Drawing(400, 200)
+        
+        # Create bar chart
+        bc = VerticalBarChart()
+        bc.x = 50
+        bc.y = 50
+        bc.height = 125
+        bc.width = 300
+        bc.data = [percentages]
+        bc.categoryAxis.categoryNames = subjects
+        bc.categoryAxis.labels.boxAnchor = 'ne'
+        bc.categoryAxis.labels.angle = 30
+        bc.categoryAxis.labels.dx = -8
+        bc.categoryAxis.labels.dy = -2
+        bc.valueAxis.valueMin = 0
+        bc.valueAxis.valueMax = 100
+        bc.valueAxis.valueStep = 10
+        bc.bars[0].fillColor = colors.lightblue
+        
+        drawing.add(bc)
+        return drawing
+    
+    def _create_pie_chart(self, results: List[Dict[str, Any]]) -> Drawing:
+        """Create pie chart for grade distribution"""
+        # Calculate grade distribution
+        grade_counts = {'A+': 0, 'A': 0, 'B+': 0, 'B': 0, 'C': 0, 'D': 0, 'F': 0}
+        for result in results:
+            percentage = result.get('percentage', 0)
+            grade = self._calculate_grade(percentage)
+            grade_counts[grade] = grade_counts.get(grade, 0) + 1
+        
+        # Filter out grades with zero count
+        grades = []
+        counts = []
+        for grade, count in grade_counts.items():
+            if count > 0:
+                grades.append(grade)
+                counts.append(count)
+        
+        # Create drawing
+        drawing = Drawing(400, 200)
+        
+        # Create pie chart
+        pc = Pie()
+        pc.x = 150
+        pc.y = 50
+        pc.width = 100
+        pc.height = 100
+        pc.data = counts
+        pc.labels = grades
+        pc.slices.strokeWidth = 0.5
+        
+        drawing.add(pc)
+        return drawing
+    
+    def _generate_pdf(self, elements: List, organization_data: Dict[str, Any], customization: Dict[str, Any]) -> BytesIO:
+        """Generate PDF from elements"""
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer)
+        
+        # Add watermark if enabled
+        if customization.get('watermark'):
+            elements.insert(0, self._create_watermark(customization['watermark']))
+        
+        # Add QR code if enabled
+        if customization.get('qr_data'):
+            elements.append(self._create_qr_code(customization['qr_data']))
+        
+        doc.build(elements)
+        return buffer

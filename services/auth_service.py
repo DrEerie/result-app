@@ -1,9 +1,10 @@
 # services/auth_service.py
 from flask import session, request, current_app
-from flask_login import UserMixin, login_user, logout_user, current_user
+from flask_login import UserMixin, login_user, logout_user, current_user, login_manager
 from werkzeug.security import generate_password_hash
 from models.organization import Organization
-from models.base import User, Subscription, db
+from auth.models import User, Subscription
+from models.base import db
 from services.supabase_client import supabase_client
 import uuid
 import logging
@@ -193,4 +194,15 @@ def load_user(user_id):
     user = User.query.filter_by(id=user_id).first()
     if user:
         return AuthUser(user.id)
+    return None
+
+def request_loader(request):
+    """Load user from request for API token authentication (optional)"""
+    api_token = request.headers.get('Authorization')
+    if api_token:
+        # Example: Bearer <token>
+        token = api_token.replace('Bearer ', '')
+        user = User.query.filter_by(api_token=token).first()
+        if user:
+            return AuthUser(user.id)
     return None

@@ -116,30 +116,37 @@ result-app/
 │  └─ main_routes.py          # Route endpoints for user and organization auth
 │  └─ auth.py                
 ├── templates/
-│   ├── _header.html                # Global header component
-│   ├── _footer.html                # Global footer component
-│   ├── home.html                   # Landing page
-│   ├── enter_result.html           # Single result entry
-│   ├── bulk_entry.html             # Bulk result import
-│   ├── view_result.html            # Result viewing interface
-│   ├── customization.html          # Customization (was Subject Management)
-│   ├── customize_result.html       # Marksheet (individual result pdf) customization
-│   ├── customizae_class_result.html    # Class ResultSheet pdf customization
-│   ├── edit_result.html            # Edit result for changes in DB
-│   ├── privacy.html                # Telling about Privacy Policies
-│   ├── terms.html                  # Telling terms of usage etc.
-│   ├── cookies.html                # Telling cookies polices.
-│   ├── student_detail.html         # Individual Student Result Preview
-│   └── analytics.html              # Analytics dashboard
+│   ├── public/                     # PUBLIC PAGES (not logged in)
+│   │   ├── index.html              # Marketing landing page
+│   │   ├── login.html              # Login page
+│   │   ├── register.html           # Registration page
+│   │   ├── forgot_password.html    # Password reset
+│   │   └── _public_header.html     # Header for public routes
+│   │   ├── _public_footer.html     # Footer for pubic routes
+│   ├── dashboard/                  # AUTHENTICATED PAGES
+│   │   ├── _dashboard_header.html # Internal nav bar
+│   │   ├── _dashboard_footer.html # Internal footer
+│   │   ├── home.html              # Authenticated landing
+│   │   ├── enter_result.html      # Single result entry
+│   │   ├── bulk_entry.html        # Bulk result import
+│   │   ├── view_result.html       # View results
+│   │   ├── customization.html     # Customization options
+│   │   ├── customize_result.html  # Marksheet customization
+│   │   ├── customize_class_result.html  # Class sheet customization
+│   │   ├── edit_result.html       # Edit functionality
+│   │   ├── student_detail.html    # Student preview
+│   │   └── analytics.html         # Analytics dashboard
+│   ├── shared/                    # GLOBAL REUSABLE COMPONENTS
+│   │   ├── privacy.html           # Legal page
+│   │   ├── terms.html             # Legal page
+│   │   ├── cookies.html           # Legal page
+│   │   ├── 404.html               # not found errors
+│   │   └── 500.html               # Server-side errors
 ├── static/
-│   ├── css/       # Custom styling (using Tailwind CDN) so empty.
-│   ├── pdfs/      # auto-generated result pdfs by users.
-│   └── js/     # JavaScript functionality (empty since all in files)
+│   └── images/..   # include related like logo, favicon etc. in 
 ├── database/
 |   ├─ supabase_schema.sql      # Supabase DB schema with
 │   └── result.db               # SQLite database
-├── images/
-│   └── #empty   # May be include related like logo, favicon etc. in future.
 ├── tests/        # Unit tests for services/models
 │   ├── test_auth.py/       
 │   └── test_services.py               
@@ -147,7 +154,7 @@ result-app/
 │  └─ ...                     # Alembic migration scripts
 ├─ app.py                     # Will import app factory
 ├─ wsgi.py                    # Entry point for production
-├─ .env                      # Environment settings (SECRET_KEY, DB_URL, etc.)
+├─ .env                      # Environment settings (Supabase_URL, Supbase_Anon_Key etc.)
 ├─ requirements.txt
 ```
 

@@ -1,7 +1,7 @@
 # auth/models.py
-
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
+from flask_login import UserMixin
 from datetime import datetime
 import uuid
 
@@ -26,6 +26,7 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     deleted_at = db.Column(db.DateTime, nullable=True)
+    api_token = db.Column(db.String(255), unique=True, nullable=True)
     
     def __repr__(self):
         return f'<User {self.email}>'

@@ -270,3 +270,8 @@ class DatabaseTransaction:
 
 # Import datetime for timestamp
 from datetime import datetime
+
+def register_error_handlers(app):
+    """Register all error handlers with the Flask app."""
+    handler = ErrorHandler()
+    handler.init_app(app)

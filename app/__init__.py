@@ -16,7 +16,6 @@ from models.base import db
 
 # Import services
 from services.supabase_client import supabase_client
-from services.auth_service import load_user
 
 # Import middleware
 from middleware.tenant import TenantMiddleware
@@ -28,12 +27,12 @@ migrate = Migrate()
 mail = Mail()
 cors = CORS()
 
-def create_app(config_name='default'):
+def create_app(config_name='development'):
     """Application factory pattern"""
     app = Flask(__name__)
     
     # Load configuration
-    app.config.from_object(config[config_name])
+    app.config.from_object(f'app.config.{config_name.title()}Config')
     
     # Initialize extensions
     init_extensions(app)
@@ -68,7 +67,18 @@ def init_extensions(app):
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Please log in to access this page.'
-    login_manager.user_loader(load_user)
+    login_manager.login_message_category = 'info'
+    
+    # Register user_loader and request_loader using decorators
+    from services.auth_service import load_user, request_loader
+    
+    @login_manager.user_loader
+    def user_loader_callback(user_id):
+        return load_user(user_id)
+    
+    @login_manager.request_loader
+    def request_loader_callback(request):
+        return request_loader(request)
     
     # Mail
     mail.init_app(app)
@@ -103,7 +113,8 @@ def register_blueprints(app):
     from routes.analytics import analytics_bp
     from routes.settings import settings_bp
     from routes.export import export_bp
-    
+    from routes.dashboard import dashboard_bp
+
     # Register blueprints
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -112,7 +123,8 @@ def register_blueprints(app):
     app.register_blueprint(analytics_bp, url_prefix='/analytics')
     app.register_blueprint(settings_bp, url_prefix='/settings')
     app.register_blueprint(export_bp, url_prefix='/export')
-
+    app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
+    
 def setup_logging(app):
     """Setup application logging"""
     if not app.debug and not app.testing:

@@ -29,23 +29,3 @@ class ClassSettings(BaseModel):
     
     def __repr__(self):
         return f'<ClassSettings {self.class_name}-{self.section} ({self.academic_year})>'
-
-# New Attendance Model
-class Attendance(BaseModel):
-    __tablename__ = 'attendance'
-    
-    student_id = db.Column(UUID(as_uuid=True), db.ForeignKey('students.id'), nullable=False)
-    class_name = db.Column(db.String(20), nullable=False)
-    section = db.Column(db.String(5), nullable=False)
-    date = db.Column(db.Date, nullable=False)
-    status = db.Column(db.String(20), default='present')  # present, absent, late, half_day
-    marked_by = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'))
-    remarks = db.Column(db.Text)
-    
-    # Relationships
-    marker = db.relationship('User', foreign_keys=[marked_by])
-    
-    __table_args__ = (db.UniqueConstraint('organization_id', 'student_id', 'date'),)
-    
-    def __repr__(self):
-        return f'<Attendance {self.student.name} - {self.date}: {self.status}>'
