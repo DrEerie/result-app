@@ -33,7 +33,26 @@ def create_app(config_class=Config):
     limiter.init_app(app)
     
     # Initialize Talisman with CSP
-    Talisman(app, content_security_policy=app.config['CONTENT_SECURITY_POLICY'])
+    csp = {
+    'default-src': "'self'",
+    'script-src': [
+        "'self'",
+        "'unsafe-inline'",
+        'https://cdn.tailwindcss.com',
+        'https://unpkg.com'
+    ],
+    'style-src': [
+        "'self'",
+        "'unsafe-inline'",
+        'https://cdnjs.cloudflare.com'
+    ],
+    'img-src': "* data:",
+    'connect-src': "*",
+    'font-src': "*"
+    }
+
+# 🔐 Inject Talisman with relaxed CSP for dev
+    Talisman(app, content_security_policy=csp)
 
     # Configure login
     login_manager.login_view = 'auth.login'

@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResultApp - Smart Academic Results Management</title>
-    <meta name="description" content="Transform how you manage academic results with our intelligent SaaS platform. Streamlined result entry, analytics, and automated report generation.">
-    
+    <meta name="description"
+        content="Transform how you manage academic results with our intelligent SaaS platform. Streamlined result entry, analytics, and automated report generation.">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    
+
     <!-- Custom Styles -->
     <style>
-
         /* Gradient animations */
         .gradient-bg {
             background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
@@ -36,19 +34,41 @@
         }
 
         @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
         }
 
         @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
-            50% { box-shadow: 0 0 40px rgba(102, 126, 234, 0.6); }
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(102, 126, 234, 0.6);
+            }
         }
 
         @keyframes slideInUp {
@@ -56,15 +76,24 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-        .animate-slide-up { animation: slideInUp 0.6s ease-out forwards; }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .animate-pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .animate-slide-up {
+            animation: slideInUp 0.6s ease-out forwards;
+        }
 
         /* Unique borders with effects */
         .wavy-border {
@@ -84,8 +113,13 @@
         }
 
         @keyframes wave {
-            0% { left: -100%; }
-            100% { left: 100%; }
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 100%;
+            }
         }
 
         .glowing-card {
@@ -99,11 +133,6 @@
             transform: translateY(-5px);
         }
 
-        /* Stats counter animation */
-        .counter {
-            font-variant-numeric: tabular-nums;
-        }
-
         /* Blob animations */
         .blob {
             border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
@@ -111,8 +140,13 @@
         }
 
         @keyframes blob-spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Custom scrollbar */
@@ -138,6 +172,7 @@
         }
     </style>
 </head>
+
 <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
     <!-- Include Header -->
     {% include 'public/_public_header.html' %}
@@ -146,159 +181,304 @@
     <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
         <!-- Animated Background -->
         <div class="absolute inset-0 gradient-bg opacity-10"></div>
-        
+
         <!-- Floating Blobs -->
-        <div class="absolute top-20 left-10 w-72 h-72 bg-indigo-400 rounded-full blob opacity-20 blur-xl"></div>
-        <div class="absolute bottom-20 right-10 w-96 h-96 bg-purple-400 rounded-full blob opacity-20 blur-xl" style="animation-delay: -10s;"></div>
-        
+        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-400 rounded-full blob opacity-20 blur-xl animate-float"
+            style="animation-delay: -5s;"></div>
+        <div class="absolute bottom-20 right-10 w-80 h-80 bg-emerald-400 rounded-full blob opacity-20 blur-xl animate-fade-in-up"
+            style="animation-delay: -5s;"></div>
+
         <div class="container mx-auto px-6 relative z-10">
             <div class="text-center max-w-5xl mx-auto">
                 <div class="animate-slide-up">
-                    <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                    <h1 class="mt-12 md:text-7xl font-bold mb-8 leading-tight">
                         Smart Academic
-                        <span class="gradient-text block">Results Management</span>
+                        <span
+                            class="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+                            <br>
+                            Result Management
+                        </span>
                     </h1>
                 </div>
-                
+
                 <div class="animate-slide-up" style="animation-delay: 0.2s;">
                     <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-                        Transform how you manage student results with our intelligent SaaS platform. 
+                        Transform how you manage student results with our intelligent SaaS platform.
                         Streamlined entry, powerful analytics, and automated report generation.
                     </p>
                 </div>
-                
-                <div class="animate-slide-up flex flex-col sm:flex-row gap-4 justify-center mb-12" style="animation-delay: 0.4s;">
-                    <button class="gradient-border group">
-                        <div class="bg-white dark:bg-gray-900 rounded-lg px-8 py-4 font-semibold text-lg transition-all duration-300 group-hover:bg-opacity-90">
-                            Start Free Trial
-                        </div>
-                    </button>
-                    <button class="px-8 py-4 border-2 border-indigo-500 rounded-lg font-semibold text-lg hover:bg-indigo-500 hover:text-white transition-all duration-300 flex items-center gap-2">
-                        <i data-lucide="play" class="w-5 h-5"></i>
+
+                <!-- CTA Buttons -->
+                <div
+                    class="animate-fade-in-up delay-200 flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+                    <a href="/auth/signup"
+                        class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold py-4 px-8 rounded-full border-2 border-slate-200 dark:border-slate-600 hover:border-primary-500 dark:hover:border-primary-400 inline-flex items-center group shadow-lg">
+                        Start Free Trial
+                        <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
+                    </a>
+                    <a href="#demo"
+                        class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold py-4 px-8 rounded-full border-2 border-slate-200 dark:border-slate-600 hover:border-primary-500 dark:hover:border-primary-400 inline-flex items-center group shadow-lg">
+                        <i class="fas fa-play mr-2 text-primary-600"></i>
                         Watch Demo
-                    </button>
+                    </a>
                 </div>
-                
-                <!-- Stats -->
-                <div class="animate-slide-up grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto" style="animation-delay: 0.6s;">
-                    <div class="text-center">
-                        <div class="text-3xl md:text-4xl font-bold gradient-text counter">10K+</div>
-                        <div class="text-gray-600 dark:text-gray-400">Students Managed</div>
+
+                <!-- Hero Image/Demo -->
+                <div class="animate-fade-in-up delay-200 relative">
+                    <div
+                        class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 mx-auto max-w-5xl animate-float border border-white/20">
+                        <div
+                            class="bg-gradient-to-br from-indigo-500 via-purple-600 to-blue-600 rounded-2xl h-80 md:h-96 flex items-center justify-center relative overflow-hidden">
+                            <div class="text-center text-white z-10">
+                                <i class="fas fa-chart-line w-auto h-auto text-amber-800"></i>
+                                <h3 class="text-2xl font-bold mb-2">Dashboard Preview</h3>
+                                <p class="text-indigo-100">Beautiful analytics and insights</p>
+                            </div>
+                            <!-- Overlay pattern -->
+                            <div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-white/10">
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-center">
-                        <div class="text-3xl md:text-4xl font-bold gradient-text counter">500+</div>
-                        <div class="text-gray-600 dark:text-gray-400">Schools Trust Us</div>
+                </div>
+                <!-- Trust Indicators -->
+                <div
+                    class="flex flex-wrap justify-center items-center gap-8 text-sm text-gray-500 dark:text-gray-400 mb-16 mt-12 mx-auto">
+                    <div
+                        class="flex items-center gap-2 bg-white/50 dark:bg-gray-800/50 px-4 py-2 rounded-full backdrop-blur-sm">
+                        <i class="fas fa-credit-card w-auto h-auto text-emerald-600"></i>
+                        <span>No Credit Card Required</span>
                     </div>
-                    <div class="text-center">
-                        <div class="text-3xl md:text-4xl font-bold gradient-text counter"> 99.9% </div>
-                        <div class="text-gray-600 dark:text-gray-400">Uptime</div>
+                    <div
+                        class="flex items-center gap-2 bg-white/50 dark:bg-gray-800/50 px-4 py-2 rounded-full backdrop-blur-sm">
+                        <i class="fas fa-check-circle w-auto h-auto text-magenta-600"></i>
+                        <span>Free 10-Days Trial</span>
                     </div>
-                    <div class="text-center">
-                        <div class="text-3xl md:text-4xl font-bold gradient-text counter"> 24/7 </div>
-                        <div class="text-gray-600 dark:text-gray-400">Support</div>
+                    <div
+                        class="flex items-center gap-2 bg-white/50 dark:bg-gray-800/50 px-4 py-2 rounded-full backdrop-blur-sm">
+                        <i class="fas fa-shield-alt w-auto h-auto text-purple-500"></i>
+                        <span>Ultra Secure System</span>
                     </div>
                 </div>
             </div>
         </div>
-        
+        <!-- Floating Elements -->
+        <div
+            class="absolute top-10 right-10 w-16 h-16 bg-white/20 rounded-full flex items-center justify-center animate-float">
+            <i class="fas fa-chart-pie text-white text-xl"></i>
+        </div>
+        <div
+            class="absolute bottom-10 left-10 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center animate-float delay-200">
+            <i class="fas fa-graduation-cap text-white"></i>
+        </div>
+
         <!-- Scroll Indicator -->
         <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-            <i data-lucide="chevron-down" class="w-6 h-6 text-indigo-500"></i>
+            <i class="fas fa-chevron-down w-6 h-6 text-indigo-500"></i>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section class="py-20 bg-gray-50 dark:bg-gray-800 relative overflow-hidden">
-        <div class="wavy-border"></div>
-        
-        <div class="container mx-auto px-6">
+    <section id="features" class="py-20 bg-white dark:bg-gray-900 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold mb-6">
-                    Powerful <span class="gradient-text">Features</span>
+                <div
+                    class="inline-block bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent text-sm font-semibold uppercase tracking-wide mb-4">
+                    Features</div>
+                <h2 class="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                    Powerful Features for
+                    <span class="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Modern
+                        Education</span>
                 </h2>
                 <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                    Everything you need to manage academic results efficiently and effectively
+                    Everything you need to manage student results efficiently and professionally
                 </p>
             </div>
-            
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Feature Cards -->
-                <div class="glowing-card bg-white dark:bg-gray-900 p-8 rounded-xl">
-                    <div class="w-16 h-16 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center mb-6 animate-float">
-                        <i data-lucide="bar-chart-3" class="w-8 h-8 text-indigo-600"></i>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div
+                    class="group bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-gray-200/50 dark:border-gray-600/50 relative overflow-hidden">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-indigo-600/5 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     </div>
-                    <h3 class="text-2xl font-bold mb-4">Smart Analytics</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">
-                        Get detailed insights into student performance with advanced analytics and visual reports.
-                    </p>
-                    <button class="text-indigo-600 font-semibold hover:text-indigo-800 transition-colors">
-                        Learn More →
-                    </button>
+                    <div class="relative">
+                        <div
+                            class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:animate-pulse-glow group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-file-alt text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Professional Reports</h3>
+                        <p class="text-gray-600 dark:text-gray-300">Generate beautiful, customizable PDF reports and
+                            marksheets with your institution's branding.</p>
+                    </div>
                 </div>
-                
-                <div class="glowing-card bg-white dark:bg-gray-900 p-8 rounded-xl" style="animation-delay: 0.1s;">
-                    <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-900 rounded-lg flex items-center justify-center mb-6 animate-float">
-                        <i data-lucide="upload" class="w-8 h-8 text-emerald-600"></i>
+
+                <!-- Feature 2 -->
+                <div
+                    class="group bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-gray-200/50 dark:border-gray-600/50 relative overflow-hidden">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-indigo-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     </div>
-                    <h3 class="text-2xl font-bold mb-4">Bulk Import</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">
-                        Upload results in bulk using CSV/Excel files with intelligent validation and error checking.
-                    </p>
-                    <button class="text-emerald-600 font-semibold hover:text-emerald-800 transition-colors">
-                        Learn More →
-                    </button>
+                    <div class="relative">
+                        <div
+                            class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:animate-pulse-glow group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-chart-bar text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Advanced Analytics</h3>
+                        <p class="text-gray-600 dark:text-gray-300">Track performance trends, identify patterns, and
+                            make data-driven decisions with comprehensive analytics.</p>
+                    </div>
                 </div>
-                
-                <div class="glowing-card bg-white dark:bg-gray-900 p-8 rounded-xl" style="animation-delay: 0.2s;">
-                    <div class="w-16 h-16 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mb-6 animate-float">
-                        <i data-lucide="file-text" class="w-8 h-8 text-purple-600"></i>
+
+                <!-- Feature 3 -->
+                <div
+                    class="group bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-gray-200/50 dark:border-gray-600/50 relative overflow-hidden">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-pink-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     </div>
-                    <h3 class="text-2xl font-bold mb-4">Auto Reports</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">
-                        Generate beautiful PDF marksheets and class reports automatically with custom branding.
-                    </p>
-                    <button class="text-purple-600 font-semibold hover:text-purple-800 transition-colors">
-                        Learn More →
-                    </button>
+                    <div class="relative">
+                        <div
+                            class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 group-hover:animate-pulse-glow group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-users text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Multi-User Access</h3>
+                        <p class="text-gray-600 dark:text-gray-300">Collaborate with teachers and staff with role-based
+                            permissions and secure access controls.</p>
+                    </div>
                 </div>
-                
-                <div class="glowing-card bg-white dark:bg-gray-900 p-8 rounded-xl" style="animation-delay: 0.3s;">
-                    <div class="w-16 h-16 bg-rose-100 dark:bg-rose-900 rounded-lg flex items-center justify-center mb-6 animate-float">
-                        <i data-lucide="users" class="w-8 h-8 text-rose-600"></i>
+
+                <!-- Feature 4 -->
+                <div
+                    class="group bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-gray-200/50 dark:border-gray-600/50 relative overflow-hidden">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-green-600/5 to-teal-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     </div>
-                    <h3 class="text-2xl font-bold mb-4">Multi-Tenant</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">
-                        Secure multi-organization support with role-based access controls and data isolation.
-                    </p>
-                    <button class="text-rose-600 font-semibold hover:text-rose-800 transition-colors">
-                        Learn More →
-                    </button>
+                    <div class="relative">
+                        <div
+                            class="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-600 rounded-2xl flex items-center justify-center mb-6 group-hover:animate-pulse-glow group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-upload text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Bulk Import</h3>
+                        <p class="text-gray-600 dark:text-gray-300">Save time with Excel/CSV bulk import functionality
+                            for results and student data.</p>
+                    </div>
                 </div>
-                
-                <div class="glowing-card bg-white dark:bg-gray-900 p-8 rounded-xl" style="animation-delay: 0.4s;">
-                    <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900 rounded-lg flex items-center justify-center mb-6 animate-float">
-                        <i data-lucide="shield-check" class="w-8 h-8 text-amber-600"></i>
+
+                <!-- Feature 5 -->
+                <div
+                    class="group bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-gray-200/50 dark:border-gray-600/50 relative overflow-hidden">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-orange-600/5 to-red-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     </div>
-                    <h3 class="text-2xl font-bold mb-4">Audit Trail</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">
-                        Complete audit logging for all changes with timestamp tracking and user attribution.
-                    </p>
-                    <button class="text-amber-600 font-semibold hover:text-amber-800 transition-colors">
-                        Learn More →
-                    </button>
+                    <div class="relative">
+                        <div
+                            class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mb-6 group-hover:animate-pulse-glow group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-mobile-alt text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Mobile Responsive</h3>
+                        <p class="text-gray-600 dark:text-gray-300">Access your data anywhere, anytime with our fully
+                            responsive design that works on all devices.</p>
+                    </div>
                 </div>
-                
-                <div class="glowing-card bg-white dark:bg-gray-900 p-8 rounded-xl" style="animation-delay: 0.5s;">
-                    <div class="w-16 h-16 bg-cyan-100 dark:bg-cyan-900 rounded-lg flex items-center justify-center mb-6 animate-float">
-                        <i data-lucide="smartphone" class="w-8 h-8 text-cyan-600"></i>
+
+                <!-- Feature 6 -->
+                <div
+                    class="group bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-gray-200/50 dark:border-gray-600/50 relative overflow-hidden">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-indigo-600/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     </div>
-                    <h3 class="text-2xl font-bold mb-4">Mobile Ready</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">
-                        Access and manage results from anywhere with our responsive mobile-first design.
+                    <div class="relative">
+                        <div
+                            class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:animate-pulse-glow group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-cog text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Customizable</h3>
+                        <p class="text-gray-600 dark:text-gray-300">Adapt the system to your needs with flexible grading
+                            systems, custom fields, and personalized layouts.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="py-20 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 relative">
+        <div class="absolute top-0 left-0 right-0 h-20 bg-white dark:bg-gray-900 curve-bottom"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="animate-fade-in-up">
+                    <div
+                        class="inline-block bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent text-sm font-semibold  tracking-wide mb-4">
+                        Why Choose EduResult</div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                        Trusted by educators worldwide
+                    </h2>
+                    <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
+                        Join thousands of educational institutions that have transformed their result management process
+                        with our comprehensive platform.
                     </p>
-                    <button class="text-cyan-600 font-semibold hover:text-cyan-800 transition-colors">
-                        Learn More →
-                    </button>
+
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div
+                                class="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-clock text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 dark:text-white mb-1">Save 10+ Hours Weekly</h4>
+                                <p class="text-gray-600 dark:text-gray-300">Automate repetitive tasks and focus on what
+                                    matters most - education.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div
+                                class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-shield-alt text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 dark:text-white mb-1">Bank-Level Security</h4>
+                                <p class="text-gray-600 dark:text-gray-300">Your data is protected with enterprise-grade
+                                    encryption and security.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div
+                                class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-headphones text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 dark:text-white mb-1">24/7 Support</h4>
+                                <p class="text-gray-600 dark:text-gray-300">Get help whenever you need it with our
+                                    dedicated support team.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="animate-fade-in-up delay-200">
+                    <div
+                        class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">10+</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-300">Schools</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">300+</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-300">Teachers</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">5000+</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-300">Students</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">99.9%</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-300">Uptime</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -315,7 +495,7 @@
                     Choose the perfect plan for your institution. Start free and scale as you grow.
                 </p>
             </div>
-            
+
             <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                 <!-- Basic Plan -->
                 <div class="glowing-card bg-white dark:bg-gray-900 p-8 rounded-xl">
@@ -324,73 +504,76 @@
                         <div class="text-4xl font-bold mb-2">$0<span class="text-lg text-gray-500">/month</span></div>
                         <p class="text-gray-600 dark:text-gray-300">Perfect for small schools</p>
                     </div>
-                    
+
                     <ul class="space-y-4 mb-8">
                         <li class="flex items-center">
-                            <i data-lucide="check" class="w-5 h-5 text-green-500 mr-3"></i>
+                            <i class="fas fa-user-graduate w-5 h-5 text-green-500 mr-3"></i>
                             Up to 100 students
                         </li>
                         <li class="flex items-center">
-                            <i data-lucide="check" class="w-5 h-5 text-green-500 mr-3"></i>
+                            <i class="fas fa-check w-5 h-5 text-green-500 mr-3"></i>
                             Basic reports
                         </li>
                         <li class="flex items-center">
-                            <i data-lucide="check" class="w-5 h-5 text-green-500 mr-3"></i>
+                            <i class="fas fa-check w-5 h-5 text-green-500 mr-3"></i>
                             Email support
                         </li>
                         <li class="flex items-center">
-                            <i data-lucide="check" class="w-5 h-5 text-green-500 mr-3"></i>
+                            <i class="fas fa-check w-5 h-5 text-green-500 mr-3"></i>
                             1 organization
                         </li>
                     </ul>
-                    
-                    <button class="w-full py-3 border-2 border-indigo-500 text-indigo-500 rounded-lg font-semibold hover:bg-indigo-500 hover:text-white transition-all duration-300">
+
+                    <button
+                        class="w-full py-3 border-2 border-indigo-500 text-indigo-500 rounded-lg font-semibold hover:bg-indigo-500 hover:text-white transition-all duration-300">
                         Get Started
                     </button>
                 </div>
-                
+
                 <!-- Pro Plan -->
                 <div class="glowing-card bg-white dark:bg-gray-900 p-8 rounded-xl relative animate-pulse-glow">
                     <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                        <span class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                        <span
+                            class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
                             Most Popular
                         </span>
                     </div>
-                    
+
                     <div class="text-center mb-8">
                         <h3 class="text-2xl font-bold mb-2">Professional</h3>
                         <div class="text-4xl font-bold mb-2">$29<span class="text-lg text-gray-500">/month</span></div>
                         <p class="text-gray-600 dark:text-gray-300">For growing institutions</p>
                     </div>
-                    
+
                     <ul class="space-y-4 mb-8">
                         <li class="flex items-center">
-                            <i data-lucide="check" class="w-5 h-5 text-green-500 mr-3"></i>
+                            <i class="fas fa-check w-5 h-5 text-green-500 mr-3"></i>
                             Up to 1,000 students
                         </li>
                         <li class="flex items-center">
-                            <i data-lucide="check" class="w-5 h-5 text-green-500 mr-3"></i>
+                            <i class="fas fa-check w-5 h-5 text-green-500 mr-3"></i>
                             Advanced analytics
                         </li>
                         <li class="flex items-center">
-                            <i data-lucide="check" class="w-5 h-5 text-green-500 mr-3"></i>
+                            <i class="fas fa-check w-5 h-5 text-green-500 mr-3"></i>
                             Priority support
                         </li>
                         <li class="flex items-center">
-                            <i data-lucide="check" class="w-5 h-5 text-green-500 mr-3"></i>
+                            <i class="fas fa-check w-5 h-5 text-green-500 mr-3"></i>
                             Custom branding
                         </li>
                         <li class="flex items-center">
-                            <i data-lucide="check" class="w-5 h-5 text-green-500 mr-3"></i>
+                            <i class="fas fa-check w-5 h-5 text-green-500 mr-3"></i>
                             Bulk import/export
                         </li>
                     </ul>
-                    
-                    <button class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
+
+                    <button
+                        class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
                         Start Trial
                     </button>
                 </div>
-                
+
                 <!-- Enterprise Plan -->
                 <div class="glowing-card bg-white dark:bg-gray-900 p-8 rounded-xl">
                     <div class="text-center mb-8">
@@ -398,31 +581,32 @@
                         <div class="text-4xl font-bold mb-2">$99<span class="text-lg text-gray-500">/month</span></div>
                         <p class="text-gray-600 dark:text-gray-300">For large organizations</p>
                     </div>
-                    
+
                     <ul class="space-y-4 mb-8">
                         <li class="flex items-center">
-                            <i data-lucide="check" class="w-5 h-5 text-green-500 mr-3"></i>
+                            <i class="fas fa-check w-5 h-5 text-green-500 mr-3"></i>
                             Unlimited students
                         </li>
                         <li class="flex items-center">
-                            <i data-lucide="check" class="w-5 h-5 text-green-500 mr-3"></i>
+                            <i class="fas fa-check w-5 h-5 text-green-500 mr-3"></i>
                             White-label solution
                         </li>
                         <li class="flex items-center">
-                            <i data-lucide="check" class="w-5 h-5 text-green-500 mr-3"></i>
+                            <i class="fas fa-check w-5 h-5 text-green-500 mr-3"></i>
                             24/7 phone support
                         </li>
                         <li class="flex items-center">
-                            <i data-lucide="check" class="w-5 h-5 text-green-500 mr-3"></i>
+                            <i class="fas fa-check w-5 h-5 text-green-500 mr-3"></i>
                             API access
                         </li>
                         <li class="flex items-center">
-                            <i data-lucide="check" class="w-5 h-5 text-green-500 mr-3"></i>
+                            <i class="fas fa-check w-5 h-5 text-green-500 mr-3"></i>
                             Custom integrations
                         </li>
                     </ul>
-                    
-                    <button class="w-full py-3 border-2 border-indigo-500 text-indigo-500 rounded-lg font-semibold hover:bg-indigo-500 hover:text-white transition-all duration-300">
+
+                    <button
+                        class="w-full py-3 border-2 border-indigo-500 text-indigo-500 rounded-lg font-semibold hover:bg-indigo-500 hover:text-white transition-all duration-300">
                         Contact Sales
                     </button>
                 </div>
@@ -441,23 +625,25 @@
                     Don't just take our word for it. Here's what educators love about ResultApp.
                 </p>
             </div>
-            
+
             <div class="grid md:grid-cols-3 gap-8">
                 <div class="glowing-card bg-white dark:bg-gray-900 p-8 rounded-xl">
                     <div class="flex items-center mb-4">
                         <div class="flex text-yellow-400">
-                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                            <i class="fas fa-star w-5 h-5 fill-current"></i>
+                            <i class="fas fa-star w-5 h-5 fill-current"></i>
+                            <i class="fas fa-star w-5 h-5 fill-current"></i>
+                            <i class="fas fa-star w-5 h-5 fill-current"></i>
+                            <i class="fas fa-star w-5 h-5 fill-current"></i>
                         </div>
                     </div>
                     <p class="text-gray-600 dark:text-gray-300 mb-6 italic">
-                        "ResultApp has transformed how we manage student results. The analytics features give us insights we never had before."
+                        "ResultApp has transformed how we manage student results. The analytics features give us
+                        insights we never had before."
                     </p>
                     <div class="flex items-center">
-                        <div class="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                        <div
+                            class="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
                             SA
                         </div>
                         <div>
@@ -466,22 +652,24 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="glowing-card bg-white dark:bg-gray-900 p-8 rounded-xl">
                     <div class="flex items-center mb-4">
                         <div class="flex text-yellow-400">
-                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                            <i class="fas fa-star w-5 h-5 fill-current"></i>
+                            <i class="fas fa-star w-5 h-5 fill-current"></i>
+                            <i class="fas fa-star w-5 h-5 fill-current"></i>
+                            <i class="fas fa-star w-5 h-5 fill-current"></i>
+                            <i class="fas fa-star w-5 h-5 fill-current"></i>
                         </div>
                     </div>
                     <p class="text-gray-600 dark:text-gray-300 mb-6 italic">
-                        "The bulk import feature saved us hours of manual work. The automated report generation is simply fantastic!"
+                        "The bulk import feature saved us hours of manual work. The automated report generation is
+                        simply fantastic!"
                     </p>
                     <div class="flex items-center">
-                        <div class="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                        <div
+                            class="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
                             MJ
                         </div>
                         <div>
@@ -490,22 +678,24 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="glowing-card bg-white dark:bg-gray-900 p-8 rounded-xl">
                     <div class="flex items-center mb-4">
                         <div class="flex text-yellow-400">
-                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                            <i class="fas fa-star w-5 h-5 fill-current"></i>
+                            <i class="fas fa-star w-5 h-5 fill-current"></i>
+                            <i class="fas fa-star w-5 h-5 fill-current"></i>
+                            <i class="fas fa-star w-5 h-5 fill-current"></i>
+                            <i class="fas fa-star w-5 h-5 fill-current"></i>
                         </div>
                     </div>
                     <p class="text-gray-600 dark:text-gray-300 mb-6 italic">
-                        "Excellent customer support and a user-friendly interface. Our teachers love how easy it is to use."
+                        "Excellent customer support and a user-friendly interface. Our teachers love how easy it is to
+                        use."
                     </p>
                     <div class="flex items-center">
-                        <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                        <div
+                            class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
                             EW
                         </div>
                         <div>
@@ -529,55 +719,68 @@
                     Get answers to common questions about ResultApp
                 </p>
             </div>
-            
+
             <div class="max-w-4xl mx-auto space-y-6">
                 <div class="glowing-card bg-white dark:bg-gray-900 p-6 rounded-xl">
-                    <button class="w-full text-left flex items-center justify-between py-2 font-semibold text-lg" onclick="toggleFAQ(this)">
+                    <button class="w-full text-left flex items-center justify-between py-2 font-semibold text-lg"
+                        onclick="toggleFAQ(this)">
                         <span>How secure is our data?</span>
-                        <i data-lucide="chevron-down" class="w-5 h-5 transition-transform"></i>
+                        <i class="fas fa-chevron-down w-5 h-5 transition-transform"></i>
                     </button>
                     <div class="hidden mt-4 text-gray-600 dark:text-gray-300">
-                        We use enterprise-grade security with end-to-end encryption, regular backups, and compliance with educational data privacy standards. Your data is stored securely and never shared with third parties.
+                        We use enterprise-grade security with end-to-end encryption, regular backups, and compliance
+                        with educational data privacy standards. Your data is stored securely and never shared with
+                        third parties.
                     </div>
                 </div>
-                
+
                 <div class="glowing-card bg-white dark:bg-gray-900 p-6 rounded-xl">
-                    <button class="w-full text-left flex items-center justify-between py-2 font-semibold text-lg" onclick="toggleFAQ(this)">
+                    <button class="w-full text-left flex items-center justify-between py-2 font-semibold text-lg"
+                        onclick="toggleFAQ(this)">
                         <span>Can I import existing data?</span>
-                        <i data-lucide="chevron-down" class="w-5 h-5 transition-transform"></i>
+                        <i class="fas fa-chevron-down w-5 h-5 transition-transform"></i>
                     </button>
                     <div class="hidden mt-4 text-gray-600 dark:text-gray-300">
-                        Yes! You can easily import your existing student and result data using CSV or Excel files. Our system includes validation and error checking to ensure data integrity.
+                        Yes! You can easily import your existing student and result data using CSV or Excel files. Our
+                        system includes validation and error checking to ensure data integrity.
                     </div>
                 </div>
-                
+
                 <div class="glowing-card bg-white dark:bg-gray-900 p-6 rounded-xl">
-                    <button class="w-full text-left flex items-center justify-between py-2 font-semibold text-lg" onclick="toggleFAQ(this)">
+                    <button class="w-full text-left flex items-center justify-between py-2 font-semibold text-lg"
+                        onclick="toggleFAQ(this)">
                         <span>Is there a mobile app?</span>
-                        <i data-lucide="chevron-down" class="w-5 h-5 transition-transform"></i>
+                        <i class="fas fa-chevron-down w-5 h-5 transition-transform"></i>
                     </button>
                     <div class="hidden mt-4 text-gray-600 dark:text-gray-300">
-                        ResultApp is built with a mobile-first responsive design that works perfectly on all devices. Access all features through your mobile browser with native app-like experience.
+                        ResultApp is built with a mobile-first responsive design that works perfectly on all devices.
+                        Access all features through your mobile browser with native app-like experience.
                     </div>
                 </div>
-                
+
                 <div class="glowing-card bg-white dark:bg-gray-900 p-6 rounded-xl">
-                    <button class="w-full text-left flex items-center justify-between py-2 font-semibold text-lg" onclick="toggleFAQ(this)">
+                    <button class="w-full text-left flex items-center justify-between py-2 font-semibold text-lg"
+                        onclick="toggleFAQ(this)">
                         <span>What kind of reports can I generate?</span>
-                        <i data-lucide="chevron-down" class="w-5 h-5 transition-transform"></i>
+                        <i class="fas fa-chevron-down w-5 h-5 transition-transform"></i>
                     </button>
                     <div class="hidden mt-4 text-gray-600 dark:text-gray-300">
-                        Generate individual marksheets, class result sheets, performance analytics, grade distribution reports, and custom branded certificates. All reports are available in PDF format with professional styling.
+                        Generate individual marksheets, class result sheets, performance analytics, grade distribution
+                        reports, and custom branded certificates. All reports are available in PDF format with
+                        professional styling.
                     </div>
                 </div>
-                
+
                 <div class="glowing-card bg-white dark:bg-gray-900 p-6 rounded-xl">
-                    <button class="w-full text-left flex items-center justify-between py-2 font-semibold text-lg" onclick="toggleFAQ(this)">
+                    <button class="w-full text-left flex items-center justify-between py-2 font-semibold text-lg"
+                        onclick="toggleFAQ(this)">
                         <span>Do you offer customer support?</span>
-                        <i data-lucide="chevron-down" class="w-5 h-5 transition-transform"></i>
+                        <i class="fas fa-chevron-down w-5 h-5 transition-transform"></i>
                     </button>
                     <div class="hidden mt-4 text-gray-600 dark:text-gray-300">
-                        We provide comprehensive support including email support for all plans, priority support for Pro users, and 24/7 phone support for Enterprise customers. Plus extensive documentation and video tutorials.
+                        We provide comprehensive support including email support for all plans, priority support for Pro
+                        users, and 24/7 phone support for Enterprise customers. Plus extensive documentation and video
+                        tutorials.
                     </div>
                 </div>
             </div>
@@ -595,120 +798,51 @@
                 <p class="text-xl md:text-2xl mb-8 opacity-90">
                     Join thousands of educators who trust ResultApp for their academic data management
                 </p>
-                
+
                 <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-                    <button class="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all duration-300 animate-pulse-glow">
+                    <button
+                        class="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all duration-300 animate-pulse-glow">
                         Start Free Trial
                     </button>
-                    <button class="border-2 border-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-indigo-600 transition-all duration-300">
+                    <button
+                        class="border-2 border-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-indigo-600 transition-all duration-300">
                         Schedule Demo
                     </button>
                 </div>
-                
+
                 <p class="text-sm opacity-75">
                     No credit card required • 14-day free trial • Cancel anytime
                 </p>
             </div>
         </div>
     </section>
-
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-16">
-        <div class="container mx-auto px-6">
-            <div class="grid md:grid-cols-4 gap-8 mb-8">
-                <div>
-                    <div class="flex items-center mb-4">
-                        <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg mr-2"></div>
-                        <span class="text-xl font-bold">ResultApp</span>
-                    </div>
-                    <p class="text-gray-400 mb-4">
-                        Smart academic results management for modern educational institutions.
-                    </p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i data-lucide="twitter" class="w-5 h-5"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i data-lucide="linkedin" class="w-5 h-5"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i data-lucide="facebook" class="w-5 h-5"></i>
-                        </a>
-                    </div>
-                </div>
-                
-                <div>
-                    <h3 class="font-semibold mb-4">Product</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition-colors">Features</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Pricing</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">API</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Integrations</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h3 class="font-semibold mb-4">Company</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition-colors">About</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h3 class="font-semibold mb-4">Support</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Status</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Community</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400 text-sm">
-                    © 2025 ResultApp. All rights reserved.
-                </p>
-                <div class="flex space-x-6 mt-4 md:mt-0">
-                    <a href="/privacy" class="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</a>
-                    <a href="/terms" class="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</a>
-                    <a href="/cookies" class="text-gray-400 hover:text-white text-sm transition-colors">Cookie Policy</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
+     {% include 'public/_public_footer.html' %}
     <!-- Scripts -->
     <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
-
         // Dark mode toggle functionality
         function initDarkMode() {
             const darkModeToggle = document.getElementById('darkModeToggle');
             const html = document.documentElement;
-            
+
             // Check for saved theme preference or default to system preference
             const savedTheme = localStorage.getItem('theme');
             const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
+
             if (savedTheme) {
                 html.classList.toggle('dark', savedTheme === 'dark');
                 html.classList.toggle('light', savedTheme === 'light');
             } else if (systemPrefersDark) {
                 html.classList.add('dark');
             }
-            
+
             // Update toggle button icon
             updateDarkModeIcon();
-            
+
             if (darkModeToggle) {
                 darkModeToggle.addEventListener('click', () => {
                     const isDark = html.classList.contains('dark');
-                    
+
                     if (isDark) {
                         html.classList.remove('dark');
                         html.classList.add('light');
@@ -718,7 +852,7 @@
                         html.classList.add('dark');
                         localStorage.setItem('theme', 'dark');
                     }
-                    
+
                     updateDarkModeIcon();
                 });
             }
@@ -727,23 +861,23 @@
         function updateDarkModeIcon() {
             const darkModeToggle = document.getElementById('darkModeToggle');
             const isDark = document.documentElement.classList.contains('dark');
-            
+
+
             if (darkModeToggle) {
-                darkModeToggle.innerHTML = isDark 
-                    ? '<i data-lucide="sun" class="w-5 h-5"></i>' 
-                    : '<i data-lucide="moon" class="w-5 h-5"></i>';
-                lucide.createIcons();
+                darkModeToggle.innerHTML = isDark
+                    ? '<i class="fas fa-sun w-5 h-5"></i>'
+                    : '<i class="fas fa-moon w-5 h-5"></i>';
             }
         }
 
         // FAQ toggle functionality
         function toggleFAQ(button) {
             const content = button.nextElementSibling;
-            const icon = button.querySelector('[data-lucide]');
-            
+            const icon = button.querySelector('i');
+
             content.classList.toggle('hidden');
-            icon.style.transform = content.classList.contains('hidden') 
-                ? 'rotate(0deg)' 
+            icon.style.transform = content.classList.contains('hidden')
+                ? 'rotate(0deg)'
                 : 'rotate(180deg)';
         }
 
@@ -752,7 +886,7 @@
             const mobileMenu = document.getElementById('mobileMenu');
             const hamburger = document.getElementById('hamburger');
             const close = document.getElementById('close');
-            
+
             mobileMenu.classList.toggle('hidden');
             hamburger.classList.toggle('hidden');
             close.classList.toggle('hidden');
@@ -831,10 +965,11 @@
         }
 
         // Initialize everything when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
+            initDarkMode();
             animateCounters();
             initScrollAnimations();
-            
+
             // Add loading animation
             document.body.style.opacity = '0';
             setTimeout(() => {
