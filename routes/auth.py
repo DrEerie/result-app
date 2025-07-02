@@ -57,7 +57,7 @@ def register():
             flash(result['error'], 'error')
             return redirect(url_for('auth.register')) if not request.is_json else jsonify({'error': result['error']}), 400
     
-    return render_template('auth/register.html')
+    return render_template('public/register.html')
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():

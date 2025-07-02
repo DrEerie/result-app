@@ -14,8 +14,6 @@ venv/
 *.tmp
 *.log
 
-# Node modules
-node_modules/
 
 # Build artifacts
 dist/
@@ -38,3 +36,6 @@ result2app/
 
 # ignore .env files
 .env
+
+#ignore images
+static/images/
