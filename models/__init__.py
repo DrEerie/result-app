@@ -1,4 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
+# Import the database instance from base
+from .base import db
 
-# Create a central database instance
-db = SQLAlchemy()
+__all__ = ['db']

@@ -1,9 +1,12 @@
 # models/base.py
-from models import db
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 import uuid
 from sqlalchemy.ext.declarative import declared_attr
+
+# Create database instance
+db = SQLAlchemy()
 
 class BaseModel(db.Model):
     """Base model with common fields for multi-tenancy"""

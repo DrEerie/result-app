@@ -9,7 +9,7 @@ import logging
 from datetime import datetime
 
 # Import configurations
-from app.config import config
+from .config import config
 
 # Import database
 from models.base import db
@@ -32,7 +32,7 @@ def create_app(config_name='development'):
     app = Flask(__name__)
     
     # Load configuration
-    app.config.from_object(f'app.config.{config_name.title()}Config')
+    app.config.from_object(config[config_name])
     
     # Initialize extensions
     init_extensions(app)
@@ -114,6 +114,8 @@ def register_blueprints(app):
     from routes.settings import settings_bp
     from routes.export import export_bp
     from routes.dashboard import dashboard_bp
+    from routes.results import results_bp
+    from routes.student import student
 
     # Register blueprints
     app.register_blueprint(main_bp)
@@ -124,6 +126,8 @@ def register_blueprints(app):
     app.register_blueprint(settings_bp, url_prefix='/settings')
     app.register_blueprint(export_bp, url_prefix='/export')
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
+    app.register_blueprint(results_bp, url_prefix='/results')
+    app.register_blueprint(student, url_prefix='/student')
     
 def setup_logging(app):
     """Setup application logging"""
