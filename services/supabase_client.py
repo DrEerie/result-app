@@ -12,6 +12,8 @@ class SupabaseClient:
     
     def init_app(self, app):
         """Initialize Supabase clients with Flask app"""
+        print('DEBUG: SUPABASE_URL =', repr(app.config['SUPABASE_URL']))
+        print('DEBUG: SUPABASE_ANON_KEY =', repr(app.config['SUPABASE_ANON_KEY']))
         self.client = create_client(
             app.config['SUPABASE_URL'],
             app.config['SUPABASE_ANON_KEY']

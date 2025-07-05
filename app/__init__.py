@@ -7,6 +7,10 @@ from flask_cors import CORS
 import redis
 import logging
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Import configurations
 from .config import config
@@ -148,4 +152,4 @@ def setup_logging(app):
         app.logger.addHandler(file_handler)
         
         app.logger.setLevel(logging.INFO)
-        app.logger.info('Result App startup')
+        app.logger.info('EveClus startup')
