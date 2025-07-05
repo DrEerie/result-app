@@ -1,12 +1,10 @@
 # models/student.py
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 import uuid
 
-db = SQLAlchemy()
-
-from models.base import Attendance, BaseModel
+from .base import db, BaseModel
+from .base import Attendance
 
 class Student(BaseModel):
     __tablename__ = 'students'

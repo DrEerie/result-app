@@ -1,12 +1,9 @@
 # models/class_settings.py
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 import uuid
 
-db = SQLAlchemy()
-
-from models.base import BaseModel
+from .base import db, BaseModel
 
 class ClassSettings(BaseModel):
     __tablename__ = 'class_settings'

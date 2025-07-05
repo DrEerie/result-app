@@ -1,10 +1,9 @@
 # models/audit_logger.py
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 import uuid
 
-db = SQLAlchemy()
+from .base import db
 class AuditLog(db.Model):
     __tablename__ = 'audit_logs'
     

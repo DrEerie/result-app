@@ -1,6 +1,5 @@
 # models/usage_tracking.py
-
-from models import db
+from .base import db
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 import uuid

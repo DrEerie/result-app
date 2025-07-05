@@ -60,15 +60,14 @@ class Attendance(BaseModel):
     remarks = db.Column(db.Text)
     recorded_by = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=False)
     
-# models/student.py
-from models.subject import Subject
-
-
 # Initialize database
 def init_db(app):
     """Initialize database with app context"""
     with app.app_context():
         db.create_all()
+        
+        # Import Subject here to avoid circular imports
+        from .subject import Subject
         
         # Create default subject templates
         default_subjects = [

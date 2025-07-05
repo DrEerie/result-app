@@ -1,13 +1,9 @@
 # models/subject.py
-
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 import uuid
 
-db = SQLAlchemy()
-
-from models.base import BaseModel
+from .base import db, BaseModel
 class Subject(BaseModel):
     __tablename__ = 'subjects'
     

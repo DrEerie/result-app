@@ -1,11 +1,16 @@
 # auth/models.py
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
 from flask_login import UserMixin
 from datetime import datetime
 import uuid
 
-db = SQLAlchemy()
+# Import shared db instance
+try:
+    from models.base import db
+except ImportError:
+    # Fallback for testing or standalone usage
+    from flask_sqlalchemy import SQLAlchemy
+    db = SQLAlchemy()
 
 class User(UserMixin, db.Model):  # Add UserMixin here
     __tablename__ = 'users'
