@@ -1,10 +1,49 @@
 # app/config.py
 import os
 from datetime import timedelta
+import logging
+from logging.handlers import RotatingFileHandler
 
 class Config:
     # Basic Flask Config
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+    
+    # Logging Configuration
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
+    LOG_FILE = os.environ.get('LOG_FILE', 'app.log')
+    LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    LOG_MAX_BYTES = 10 * 1024 * 1024  # 10MB
+    LOG_BACKUP_COUNT = 5
+    
+    @staticmethod
+    def init_logging(app):
+        """Initialize logging configuration"""
+        log_level = getattr(logging, Config.LOG_LEVEL.upper())
+        
+        # Create handlers
+        file_handler = RotatingFileHandler(
+            Config.LOG_FILE,
+            maxBytes=Config.LOG_MAX_BYTES,
+            backupCount=Config.LOG_BACKUP_COUNT
+        )
+        stream_handler = logging.StreamHandler()
+        
+        # Set format
+        formatter = logging.Formatter(Config.LOG_FORMAT)
+        file_handler.setFormatter(formatter)
+        stream_handler.setFormatter(formatter)
+        
+        # Set level
+        file_handler.setLevel(log_level)
+        stream_handler.setLevel(log_level)
+        
+        # Add handlers to app logger
+        app.logger.addHandler(file_handler)
+        app.logger.addHandler(stream_handler)
+        app.logger.setLevel(log_level)
+        
+        # Also log for SQLAlchemy
+        logging.getLogger('sqlalchemy.engine').setLevel(log_level)
     
     # Security Headers
     CONTENT_SECURITY_POLICY = {
