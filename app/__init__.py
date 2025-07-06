@@ -88,7 +88,7 @@ def init_extensions(app):
     mail.init_app(app)
     
     # CORS
-    cors.init_app(app, origins=["http://localhost:3000", "https://yourdomain.com"])
+    cors.init_app(app, origins=["http://localhost:5000", "https://yourdomain.com"])
     
     # Redis (optional)
     try:

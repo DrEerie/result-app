@@ -89,8 +89,13 @@ class AuthService:
                     session['user_id'] = str(user.id)
                     session['organization_id'] = str(user.organization_id)
                     
+                    # Login user with Flask-Login
+                    from flask_login import login_user
+                    login_user(user, remember=True)
+                    
                     # Update last login
-                    user.last_login = db.datetime.utcnow()
+                    from datetime import datetime
+                    user.last_login = datetime.utcnow()
                     db.session.commit()
                     
                     return {"success": True, "user": user}
