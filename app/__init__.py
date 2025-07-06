@@ -8,6 +8,7 @@ import redis
 import logging
 from datetime import datetime
 from dotenv import load_dotenv
+import os
 
 # Load environment variables from .env file
 load_dotenv()
@@ -88,9 +89,12 @@ def init_extensions(app):
     mail.init_app(app)
     
     # CORS
-    cors.init_app(app, origins=["http://localhost:5000", "https://yourdomain.com"])
+    cors.init_app(app, origins=["http://127.0.0.1:5000", "https://yourdomain.com"])
     
     # Redis (optional)
+    
+    app.config['REDIS_URL'] = os.getenv("REDIS_URL")
+
     try:
         app.redis = redis.from_url(app.config['REDIS_URL'])
         app.redis.ping()

@@ -55,13 +55,13 @@ class Config:
     }
     
     # Rate Limiting
-    RATELIMIT_STORAGE_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+    RATELIMIT_STORAGE_URL = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/0')
     RATELIMIT_STRATEGY = 'fixed-window'
     RATELIMIT_DEFAULT = "200 per day"
     
     # Caching Configuration
     CACHE_TYPE = 'redis'
-    CACHE_REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+    CACHE_REDIS_URL = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/0')
     CACHE_DEFAULT_TIMEOUT = 300
     
     # Supabase Configuration
@@ -100,6 +100,9 @@ class Config:
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+
+    # Resend API Configuration
+    RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
     
 class DevelopmentConfig(Config):
     DEBUG = True
