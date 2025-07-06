@@ -36,7 +36,7 @@ class TenantMiddleware:
             else:
                 session.clear()
                 abort(401)
-        elif request.endpoint and not request.endpoint.startswith(('main_bp.', 'template/public')):
+        elif request.endpoint and not request.endpoint.startswith(('main.', 'auth.', 'static')):
             # Require authentication for non-public routes
             abort(401)
     
