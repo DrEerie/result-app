@@ -1,5 +1,5 @@
 # Import the database instance and models
-from .base import db, init_db
+from .base import db
 from .organization import Organization
 from .student import Student
 from .subject import Subject
@@ -16,7 +16,6 @@ except ImportError:
 
 __all__ = [
     'db',
-    'init_db',
     'Organization',
     'Student', 
     'Subject',
