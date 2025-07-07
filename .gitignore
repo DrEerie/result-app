@@ -38,3 +38,6 @@ result2app/
 
 #ignore images
 static/images/
+
+# Ignore Context-engineering files
+/context-engineering/
