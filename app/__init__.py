@@ -111,6 +111,10 @@ def init_middleware(app):
     """Initialize custom middleware"""
     TenantMiddleware(app)
     SubscriptionMiddleware(app)
+    
+    # Initialize cache middleware
+    from middleware.cache_middleware import CacheMiddleware
+    CacheMiddleware(app)
 
 def register_blueprints(app):
     """Register application blueprints"""

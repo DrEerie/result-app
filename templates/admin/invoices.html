@@ -1,0 +1,183 @@
+{% extends "dashboard/_dashboard_header.html" %}
+
+{% block title %}Invoices | EduResult{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Invoices</h1>
+        <button id="generateInvoiceBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Generate New Invoice
+        </button>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="{{ 'bg-green-100 border-green-500 text-green-700' if category == 'success' else 'bg-red-100 border-red-500 text-red-700' }} border-l-4 p-4 mb-4">
+                    <p>{{ message }}</p>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Invoice Generation Modal -->
+    <div id="invoiceModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full" aria-hidden="true">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Generate Invoice</h3>
+                <div class="mt-2 px-7 py-3">
+                    <form action="{{ url_for('billing.generate_invoice') }}" method="POST">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2 text-left" for="start_date">
+                                Billing Period Start
+                            </label>
+                            <input type="date" id="start_date" name="start_date" 
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2 text-left" for="end_date">
+                                Billing Period End
+                            </label>
+                            <input type="date" id="end_date" name="end_date" 
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+                        <div class="mb-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" name="send_email" value="true" class="form-checkbox h-5 w-5 text-blue-600">
+                                <span class="ml-2 text-gray-700">Send invoice by email</span>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <button type="button" id="closeModal" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                Cancel
+                            </button>
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                Generate
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoices Table -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full leading-normal">
+            <thead>
+                <tr>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Invoice #
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Date
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Billing Period
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Amount
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Status
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- This would be populated from database in a real implementation -->
+                {% if session.get('last_invoice') %}
+                <tr>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p class="text-gray-900 whitespace-no-wrap">{{ session.last_invoice.invoice_number }}</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p class="text-gray-900 whitespace-no-wrap">{{ session.last_invoice.issue_date }}</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p class="text-gray-900 whitespace-no-wrap">Current Month</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p class="text-gray-900 whitespace-no-wrap">{{ current_user.organization.subscription.amount }} {{ current_user.organization.subscription.currency }}</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                            <span aria-hidden class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
+                            <span class="relative">Paid</span>
+                        </span>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <a href="{{ url_for('billing.download_invoice', invoice_number=session.last_invoice.invoice_number) }}" class="text-blue-600 hover:text-blue-900">
+                            Download
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+                        <p class="text-gray-500">No invoices found. Generate your first invoice using the button above.</p>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Subscription Information -->
+    <div class="mt-8 bg-white shadow-md rounded-lg p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Current Subscription</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-gray-600">Plan: <span class="font-semibold">{{ current_user.organization.subscription.tier|capitalize }}</span></p>
+                <p class="text-gray-600">Billing Cycle: <span class="font-semibold">{{ current_user.organization.subscription.billing_cycle|capitalize }}</span></p>
+                <p class="text-gray-600">Amount: <span class="font-semibold">{{ current_user.organization.subscription.amount }} {{ current_user.organization.subscription.currency }}</span></p>
+            </div>
+            <div>
+                <p class="text-gray-600">Status: 
+                    <span class="font-semibold {% if current_user.organization.subscription.is_active %}text-green-600{% else %}text-red-600{% endif %}">
+                        {{ 'Active' if current_user.organization.subscription.is_active else 'Inactive' }}
+                    </span>
+                </p>
+                <p class="text-gray-600">Next Billing Date: <span class="font-semibold">{{ current_user.organization.subscription.expires_at.strftime('%Y-%m-%d') if current_user.organization.subscription.expires_at else 'N/A' }}</span></p>
+                {% if current_user.organization.subscription.is_trial %}
+                <p class="text-gray-600">Trial Ends: <span class="font-semibold text-orange-600">{{ current_user.organization.subscription.trial_ends_at.strftime('%Y-%m-%d') }}</span></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Modal functionality
+    const modal = document.getElementById('invoiceModal');
+    const openModalBtn = document.getElementById('generateInvoiceBtn');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    openModalBtn.addEventListener('click', function() {
+        modal.classList.remove('hidden');
+        
+        // Set default dates (current month)
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        
+        document.getElementById('start_date').value = firstDay.toISOString().split('T')[0];
+        document.getElementById('end_date').value = lastDay.toISOString().split('T')[0];
+    });
+
+    closeModalBtn.addEventListener('click', function() {
+        modal.classList.add('hidden');
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice {{ invoice.invoice_number }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .logo {
+            max-height: 60px;
+            margin-bottom: 10px;
+        }
+        .invoice-details {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .invoice-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .invoice-details th, .invoice-details td {
+            padding: 8px;
+            text-align: left;
+        }
+        .invoice-details th {
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .highlight {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="{{ config.COMPANY_LOGO_URL }}" alt="Company Logo" class="logo">
+            <h1>Invoice #{{ invoice.invoice_number }}</h1>
+        </div>
+        
+        <p>Dear {{ organization.name }},</p>
+        
+        <p>Please find attached your invoice <span class="highlight">#{{ invoice.invoice_number }}</span> for the billing period <strong>{{ invoice.billing_period.start_date }}</strong> to <strong>{{ invoice.billing_period.end_date }}</strong>.</p>
+        
+        <div class="invoice-details">
+            <h3>Invoice Summary</h3>
+            <table>
+                <tr>
+                    <th>Invoice Number:</th>
+                    <td>{{ invoice.invoice_number }}</td>
+                </tr>
+                <tr>
+                    <th>Issue Date:</th>
+                    <td>{{ invoice.issue_date }}</td>
+                </tr>
+                <tr>
+                    <th>Due Date:</th>
+                    <td>{{ invoice.due_date }}</td>
+                </tr>
+                <tr>
+                    <th>Subscription:</th>
+                    <td>{{ invoice.subscription.tier|capitalize }} Plan ({{ invoice.subscription.billing_cycle }})</td>
+                </tr>
+                <tr>
+                    <th>Total Amount:</th>
+                    <td class="highlight">{{ invoice.total }} {{ invoice.subscription.currency }}</td>
+                </tr>
+            </table>
+        </div>
+        
+        <p>The invoice has been attached to this email as a PDF file. You can also view and download your invoice from your account dashboard.</p>
+        
+        <p>Please make payment by the due date to avoid service interruption. If you have any questions about this invoice, please contact our support team.</p>
+        
+        <div style="text-align: center;">
+            <a href="{{ url_for('admin.subscription_management', _external=True) }}" class="button">View Subscription</a>
+        </div>
+        
+        <p>Thank you for your business!</p>
+        
+        <p>Best regards,<br>
+        The {{ config.COMPANY_NAME }} Team</p>
+        
+        <div class="footer">
+            <p>This is an automated email. Please do not reply to this message.</p>
+            <p>&copy; {{ now.year }} {{ config.COMPANY_NAME }}. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

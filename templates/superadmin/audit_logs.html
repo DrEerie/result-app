@@ -1,0 +1,391 @@
+{% extends "superadmin/base.html" %}
+
+{% block title %}Audit Logs | SuperAdmin{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">System Audit Logs</h1>
+        <div class="flex space-x-2">
+            <button id="filterBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                Filter
+            </button>
+            <button id="exportBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Export
+            </button>
+        </div>
+    </div>
+
+    <!-- Filter Panel (hidden by default) -->
+    <div id="filterPanel" class="bg-gray-100 p-4 rounded-lg mb-6 hidden">
+        <form method="GET" action="{{ url_for('superadmin.audit_logs') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="action">
+                    Action
+                </label>
+                <select id="action" name="action" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="">All Actions</option>
+                    <option value="login">Login</option>
+                    <option value="logout">Logout</option>
+                    <option value="create">Create</option>
+                    <option value="update">Update</option>
+                    <option value="delete">Delete</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="resource_type">
+                    Resource Type
+                </label>
+                <select id="resource_type" name="resource_type" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="">All Resources</option>
+                    <option value="tenant">Tenant</option>
+                    <option value="superadmin">SuperAdmin</option>
+                    <option value="system_settings">System Settings</option>
+                    <option value="subscription">Subscription</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="severity">
+                    Severity
+                </label>
+                <select id="severity" name="severity" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="">All Severities</option>
+                    <option value="info">Info</option>
+                    <option value="warning">Warning</option>
+                    <option value="error">Error</option>
+                    <option value="critical">Critical</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="date_range">
+                    Date Range
+                </label>
+                <select id="date_range" name="date_range" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="last7days">Last 7 Days</option>
+                    <option value="last30days">Last 30 Days</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+            </div>
+            <div id="customDateRange" class="hidden md:col-span-2">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="start_date">
+                            Start Date
+                        </label>
+                        <input type="date" id="start_date" name="start_date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="end_date">
+                            End Date
+                        </label>
+                        <input type="date" id="end_date" name="end_date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+            </div>
+            <div class="md:col-span-4 flex justify-end">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Apply Filters
+                </button>
+                <button type="reset" class="ml-2 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Reset
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Audit Logs Table -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full leading-normal">
+            <thead>
+                <tr>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Timestamp
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        User
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Action
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Resource
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Severity
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Details
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs.items %}
+                <tr>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p class="text-gray-900 whitespace-no-wrap">{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p class="text-gray-900 whitespace-no-wrap">
+                            {% if log.superadmin %}
+                                {{ log.superadmin.username }} (SuperAdmin)
+                            {% elif log.tenant %}
+                                {{ log.tenant.organization_name }} (Tenant)
+                            {% else %}
+                                System
+                            {% endif %}
+                        </p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <span class="relative inline-block px-3 py-1 font-semibold leading-tight
+                            {% if log.action in ['create', 'add'] %}
+                                text-green-900
+                            {% elif log.action in ['update', 'modify'] %}
+                                text-blue-900
+                            {% elif log.action in ['delete', 'remove'] %}
+                                text-red-900
+                            {% elif log.action == 'login' %}
+                                text-purple-900
+                            {% elif log.action == 'logout' %}
+                                text-yellow-900
+                            {% else %}
+                                text-gray-900
+                            {% endif %}">
+                            <span aria-hidden class="absolute inset-0 opacity-50 rounded-full
+                                {% if log.action in ['create', 'add'] %}
+                                    bg-green-200
+                                {% elif log.action in ['update', 'modify'] %}
+                                    bg-blue-200
+                                {% elif log.action in ['delete', 'remove'] %}
+                                    bg-red-200
+                                {% elif log.action == 'login' %}
+                                    bg-purple-200
+                                {% elif log.action == 'logout' %}
+                                    bg-yellow-200
+                                {% else %}
+                                    bg-gray-200
+                                {% endif %}"></span>
+                            <span class="relative">{{ log.action|capitalize }}</span>
+                        </span>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p class="text-gray-900 whitespace-no-wrap">
+                            {{ log.resource_type|capitalize }}
+                            {% if log.resource_id %}
+                                <span class="text-xs text-gray-500">#{{ log.resource_id[:8] }}</span>
+                            {% endif %}
+                        </p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <span class="relative inline-block px-3 py-1 font-semibold leading-tight
+                            {% if log.severity == 'info' %}
+                                text-blue-900
+                            {% elif log.severity == 'warning' %}
+                                text-yellow-900
+                            {% elif log.severity == 'error' %}
+                                text-orange-900
+                            {% elif log.severity == 'critical' %}
+                                text-red-900
+                            {% endif %}">
+                            <span aria-hidden class="absolute inset-0 opacity-50 rounded-full
+                                {% if log.severity == 'info' %}
+                                    bg-blue-200
+                                {% elif log.severity == 'warning' %}
+                                    bg-yellow-200
+                                {% elif log.severity == 'error' %}
+                                    bg-orange-200
+                                {% elif log.severity == 'critical' %}
+                                    bg-red-200
+                                {% endif %}"></span>
+                            <span class="relative">{{ log.severity|capitalize }}</span>
+                        </span>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <button class="text-blue-600 hover:text-blue-900 view-details" data-log-id="{{ log.id }}">
+                            View Details
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+                
+                {% if logs.items|length == 0 %}
+                <tr>
+                    <td colspan="6" class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+                        <p class="text-gray-500">No audit logs found matching your criteria.</p>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between">
+        <div class="inline-flex mt-2 xs:mt-0">
+            {% if logs.has_prev %}
+            <a href="{{ url_for('superadmin.audit_logs', page=logs.prev_num, **request.args) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
+                Prev
+            </a>
+            {% else %}
+            <button class="text-sm bg-gray-300 text-gray-500 font-semibold py-2 px-4 rounded-l opacity-50 cursor-not-allowed">
+                Prev
+            </button>
+            {% endif %}
+            
+            {% if logs.has_next %}
+            <a href="{{ url_for('superadmin.audit_logs', page=logs.next_num, **request.args) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r">
+                Next
+            </a>
+            {% else %}
+            <button class="text-sm bg-gray-300 text-gray-500 font-semibold py-2 px-4 rounded-r opacity-50 cursor-not-allowed">
+                Next
+            </button>
+            {% endif %}
+        </div>
+        <span class="text-xs text-gray-900 mt-2 sm:mt-0">
+            Showing <span class="font-medium">{{ logs.items|length }}</span> of <span class="font-medium">{{ logs.total }}</span> entries
+        </span>
+    </div>
+
+    <!-- Log Details Modal -->
+    <div id="logDetailsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full" aria-hidden="true">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center pb-3">
+                <h3 class="text-xl font-bold text-gray-900" id="modalTitle">Audit Log Details</h3>
+                <button id="closeModal" class="text-gray-400 hover:text-gray-500">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div id="modalContent" class="mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Timestamp</p>
+                        <p class="text-base font-semibold" id="logTimestamp"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">User</p>
+                        <p class="text-base font-semibold" id="logUser"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Action</p>
+                        <p class="text-base font-semibold" id="logAction"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Resource</p>
+                        <p class="text-base font-semibold" id="logResource"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">IP Address</p>
+                        <p class="text-base font-semibold" id="logIpAddress"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Endpoint</p>
+                        <p class="text-base font-semibold" id="logEndpoint"></p>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <p class="text-sm font-medium text-gray-500">Description</p>
+                    <p class="text-base" id="logDescription"></p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Old Values</p>
+                        <pre id="logOldValues" class="bg-gray-100 p-2 rounded text-xs overflow-auto max-h-40"></pre>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">New Values</p>
+                        <pre id="logNewValues" class="bg-gray-100 p-2 rounded text-xs overflow-auto max-h-40"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Filter panel toggle
+    document.getElementById('filterBtn').addEventListener('click', function() {
+        const filterPanel = document.getElementById('filterPanel');
+        filterPanel.classList.toggle('hidden');
+    });
+    
+    // Custom date range toggle
+    document.getElementById('date_range').addEventListener('change', function() {
+        const customDateRange = document.getElementById('customDateRange');
+        if (this.value === 'custom') {
+            customDateRange.classList.remove('hidden');
+        } else {
+            customDateRange.classList.add('hidden');
+        }
+    });
+    
+    // Export functionality
+    document.getElementById('exportBtn').addEventListener('click', function() {
+        // Get current filter parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.append('export', 'csv');
+        
+        // Redirect to export URL
+        window.location.href = '{{ url_for("superadmin.audit_logs") }}?' + urlParams.toString();
+    });
+    
+    // Modal functionality
+    const modal = document.getElementById('logDetailsModal');
+    const closeModal = document.getElementById('closeModal');
+    const viewDetailsBtns = document.querySelectorAll('.view-details');
+    
+    viewDetailsBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const logId = this.getAttribute('data-log-id');
+            
+            // Fetch log details via AJAX
+            fetch(`{{ url_for('superadmin.get_audit_log_details') }}?id=${logId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate modal with data
+                    document.getElementById('logTimestamp').textContent = new Date(data.created_at).toLocaleString();
+                    document.getElementById('logUser').textContent = data.user || 'System';
+                    document.getElementById('logAction').textContent = data.action;
+                    document.getElementById('logResource').textContent = `${data.resource_type} ${data.resource_id ? '#' + data.resource_id : ''}`;
+                    document.getElementById('logIpAddress').textContent = data.ip_address || 'N/A';
+                    document.getElementById('logEndpoint').textContent = data.endpoint || 'N/A';
+                    document.getElementById('logDescription').textContent = data.description || 'No description';
+                    
+                    // Format JSON data
+                    document.getElementById('logOldValues').textContent = data.old_values ? JSON.stringify(data.old_values, null, 2) : 'No data';
+                    document.getElementById('logNewValues').textContent = data.new_values ? JSON.stringify(data.new_values, null, 2) : 'No data';
+                    
+                    // Show modal
+                    modal.classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error fetching log details:', error);
+                    alert('Failed to load log details. Please try again.');
+                });
+        });
+    });
+    
+    closeModal.addEventListener('click', function() {
+        modal.classList.add('hidden');
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}

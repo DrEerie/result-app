@@ -13,6 +13,8 @@ venv/
 # Temporary files
 *.tmp
 *.log
+/logs/
+
 
 # Build artifacts
 dist/
@@ -30,8 +32,6 @@ static/pdf/**/*.pdf
 !static/pdfs/.gitkeep
 !static/pdf/.gitkeep
 
-# Other project
-result2app/
 
 # ignore .env files
 .env
