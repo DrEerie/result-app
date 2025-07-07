@@ -222,4 +222,6 @@ EveClus/
 ├─ .env
 ├─ requirements.txt
 ├─ README.md
+├─ .gitignore
+├─ .gitattributes
 ```
