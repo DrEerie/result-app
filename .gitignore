@@ -32,7 +32,6 @@ static/pdf/**/*.pdf
 !static/pdfs/.gitkeep
 !static/pdf/.gitkeep
 
-
 # ignore .env files
 .env
 
